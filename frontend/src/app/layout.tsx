@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { AppShell } from "@/components/layout/app-shell";
 import { AuthProvider } from "@/features/auth/auth-provider";
 import "./globals.css";
@@ -11,7 +12,9 @@ export const metadata: Metadata = {
   description: "의료진을 위한 가상 환자 컨텍스트 코파일럿",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="ko">
       <body>
