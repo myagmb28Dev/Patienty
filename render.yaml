@@ -1,0 +1,70 @@
+# Render Blueprint Specification for Patienty
+# Docs: https://render.com/docs/blueprint-spec
+
+databases:
+  - name: patienty-db
+    databaseName: patienty
+    user: patienty
+    plan: free
+    region: oregon
+    postgresMajorVersion: "17"
+    ipAllowList: []
+
+services:
+  # ------------------------------------------------------------
+  # Backend API Service (Spring Boot 4 / Java 17)
+  # ------------------------------------------------------------
+  - type: web
+    name: patienty-backend
+    runtime: docker
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod,demo
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: patienty-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: patienty-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: patienty-db
+          property: password
+      - key: PATIENTY_CORS_ALLOWED_ORIGINS
+        value: https://patienty-frontend.onrender.com,http://localhost:3000
+      - key: PATIENTY_SESSION_COOKIE_SECURE
+        value: "true"
+      - key: PATIENTY_SESSION_COOKIE_SAME_SITE
+        value: "none"
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: PATIENTY_AI_PROVIDER
+        value: openrouter
+      - key: PATIENTY_AI_OPENROUTER_MODEL
+        value: google/gemini-2.0-flash-001
+
+  # ------------------------------------------------------------
+  # Frontend Web Service (Next.js 16 / React 19)
+  # ------------------------------------------------------------
+  - type: web
+    name: patienty-frontend
+    runtime: docker
+    dockerContext: ./frontend
+    dockerfilePath: ./frontend/Dockerfile
+    plan: free
+    region: oregon
+    dockerBuildArgs:
+      - key: NEXT_PUBLIC_API_BASE_URL
+        value: https://patienty-backend.onrender.com
+    envVars:
+      - key: NEXT_PUBLIC_API_BASE_URL
+        value: https://patienty-backend.onrender.com
+      - key: NODE_ENV
+        value: production
