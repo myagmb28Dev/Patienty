@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Activity,
   ArrowRight,
   ClipboardList,
   HeartPulse,
@@ -125,11 +124,7 @@ export default function LoginPage() {
         </div>
 
         <div className="relative max-w-xl">
-          <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/80 px-3.5 py-1.5 text-xs font-medium text-slate-300">
-            <Activity className="size-3.5 text-slate-300" aria-hidden />
-            환자의 변화를 10초 안에
-          </span>
-          <h1 className="mt-6 text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl xl:text-5xl break-keep">
+          <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl xl:text-5xl break-keep">
             흩어진 기록을 모아
             <br />
             중요한 변화부터 확인하세요.
