@@ -42,7 +42,7 @@ describe("AI assistant", () => {
 
     await user.click(
       screen.getByRole("button", {
-        name: "지난 진료 이후 변경된 사항은?",
+        name: /지난 진료 이후 변경/,
       }),
     );
 

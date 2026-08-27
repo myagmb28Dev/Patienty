@@ -48,7 +48,7 @@ public class PatientQueryService {
         Instant after=clock.instant().minus(365,ChronoUnit.DAYS);
         Map<UUID,List<MeasurementRecord>> byExam=new LinkedHashMap<>(); for(MeasurementRecord r:examinations.findMeasurements(patientId,"",after,clock.instant()))byExam.computeIfAbsent(r.examinationId(),ignored->new ArrayList<>()).add(r);
         for(List<MeasurementRecord> records:byExam.values()){String description=records.stream().map(r->(r.displayName()+" "+r.value().stripTrailingZeros().toPlainString()+" "+Objects.toString(r.unit(),"")).trim()).collect(java.util.stream.Collectors.joining(", "));items.add(new TimelineItem(records.get(0).evidenceId(),"EXAMINATION",records.get(0).occurredAt(),"검사 결과",description));}
-        for(List<PrescriptionRecord> records:group(prescriptions.findRecent(patientId,after)).values()){String description=records.stream().map(r->r.medicationName()+" "+r.doseValue().stripTrailingZeros().toPlainString()+r.doseUnit()).collect(java.util.stream.Collectors.joining(", "));items.add(new TimelineItem(records.get(0).evidenceId(),"PRESCRIPTION",records.get(0).prescribedAt(),"처방 "+records.get(0).status(),description));}
+        for(List<PrescriptionRecord> records:group(prescriptions.findRecent(patientId,after)).values()){String description=records.stream().map(r->r.medicationName()+" "+r.doseValue().stripTrailingZeros().toPlainString()+r.doseUnit()).collect(java.util.stream.Collectors.joining(", "));items.add(new TimelineItem(records.get(0).evidenceId(),"PRESCRIPTION",records.get(0).prescribedAt(),formatPrescriptionTitle(records.get(0).status()),description));}
         return items.stream().sorted(Comparator.comparing(TimelineItem::occurredAt).reversed()).limit(50).toList();
     }
     public List<TimelineItem> timeline(UUID patientId){return timeline(patientId.toString());}
@@ -86,5 +86,6 @@ public class PatientQueryService {
     private Optional<Appointment> nextAppointment(UUID id){return appointments.findFirstByPatientIdAndScheduledStartAfterAndStatusInOrderByScheduledStartAsc(id,clock.instant(),UPCOMING);}
     private String departmentName(String code){return code==null?null:departments.findById(code).map(Department::getDisplayName).orElse(code);}
     private int age(LocalDate birth){return Period.between(birth,LocalDate.now(clock.withZone(CLINIC_ZONE))).getYears();}
+    private static String formatPrescriptionTitle(String status){if(status==null)return "처방 기록";return switch(status.toUpperCase()){case "ACTIVE"->"유지 처방";case "SUPERSEDED"->"처방 변경";case "SUSPENDED","SUSPEND","STOPPED"->"처방 중단";case "CANCELLED","CANCELED"->"처방 취소";case "COMPLETED"->"처방 완료";default->"처방 내역";};}
     private static String trim(String v){return v==null?"":v.trim();} private static String normalize(String v){return trim(v).toUpperCase();} private static String valueOr(String v,String fallback){return v==null||v.isBlank()?fallback:v;}
 }

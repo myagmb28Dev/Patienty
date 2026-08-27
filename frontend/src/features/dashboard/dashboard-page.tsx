@@ -156,7 +156,7 @@ export function DashboardPage() {
                     진단이 아닌, 기록상 변화가 감지된 담당 환자입니다.
                   </p>
                 </div>
-                <span className="badge border-teal-200 bg-teal-50 text-xs font-bold text-teal-800">
+                <span className="badge border-slate-200 bg-slate-100 text-xs font-semibold text-slate-700">
                   AI 변화 감지
                 </span>
               </div>
@@ -168,14 +168,14 @@ export function DashboardPage() {
                   title="특이 변화 없음"
                 />
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {attentionPatients.map((patient) => (
                     <Link
-                      className="group flex items-center gap-3 rounded-xl border border-slate-200 p-3 transition hover:border-teal-300 hover:bg-teal-50/40"
+                      className="group flex items-center gap-3 rounded-xl border border-slate-200/90 p-3 transition hover:border-slate-300 hover:bg-slate-50 shadow-2xs"
                       href={`/patients/${patient.patientNumber || patient.id}`}
                       key={patient.id}
                     >
-                      <div className="grid size-10 shrink-0 place-items-center rounded-full bg-slate-100 text-sm font-black text-slate-700">
+                      <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-slate-800 text-xs font-bold text-white">
                         {patient.name.slice(0, 1)}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -202,7 +202,7 @@ export function DashboardPage() {
                   최근 조회한 환자 바로가기 목록입니다.
                 </p>
               </div>
-              <Link className="text-sm font-bold text-teal-700 hover:text-teal-900" href="/patients">
+              <Link className="text-sm font-semibold text-slate-600 hover:text-slate-900" href="/patients">
                 전체 환자 보기
               </Link>
             </div>
@@ -215,7 +215,7 @@ export function DashboardPage() {
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {recent.map((patient) => (
                   <Link
-                    className="rounded-xl border border-slate-200 p-4 transition hover:border-teal-300 hover:bg-teal-50/40"
+                    className="rounded-xl border border-slate-200/90 p-4 transition hover:border-slate-300 hover:bg-slate-50 shadow-2xs"
                     href={`/patients/${patient.patientNumber || patient.id}`}
                     key={patient.id}
                   >
@@ -239,32 +239,24 @@ function MetricCard({
   label,
   value,
   loading,
-  tone,
 }: {
   icon: typeof CalendarClock;
   label: string;
   value: number;
   loading: boolean;
-  tone: "teal" | "amber" | "blue" | "slate";
+  tone?: "teal" | "amber" | "blue" | "slate";
 }) {
-  const tones = {
-    teal: "bg-teal-50 text-teal-700",
-    amber: "bg-amber-50 text-amber-700",
-    blue: "bg-sky-50 text-sky-700",
-    slate: "bg-slate-100 text-slate-700",
-  };
-
   return (
     <div className="card flex items-center gap-4 p-5">
-      <div className={`grid size-12 place-items-center rounded-2xl ${tones[tone]}`}>
-        <Icon className="size-6" aria-hidden />
+      <div className="grid size-11 place-items-center rounded-xl bg-slate-100 text-slate-700 border border-slate-200/60">
+        <Icon className="size-5" aria-hidden />
       </div>
       <div>
-        <p className="text-sm font-semibold text-slate-500">{label}</p>
+        <p className="text-xs font-semibold text-slate-500">{label}</p>
         {loading ? (
           <div className="mt-2 h-7 w-12 animate-pulse rounded bg-slate-100" />
         ) : (
-          <p className="mt-1 text-2xl font-black text-slate-950">{value}</p>
+          <p className="mt-0.5 text-2xl font-bold tracking-tight text-slate-900">{value}</p>
         )}
       </div>
     </div>

@@ -86,13 +86,13 @@ function MeasurementCard({
 
   return (
     <article
-      className="rounded-2xl border border-slate-200 bg-slate-50/45 p-4"
+      className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-2xs transition hover:border-slate-300"
       data-evidence-ids={measurement.points.map((point) => point.evidenceId).join(" ")}
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="font-black text-slate-900">{measurement.displayName}</p>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="text-sm font-bold text-slate-900">{measurement.displayName}</p>
+          <p className="mt-0.5 text-xs text-slate-500">
             최근 {measurement.points.length}회 측정 · {measurement.unit || "단위 없음"}
           </p>
         </div>
@@ -112,22 +112,24 @@ function MeasurementCard({
       </div>
 
       {chartData.length >= 2 ? (
-        <div aria-label={chartLabel} className="chart-container mt-5 h-48 w-full" role="img">
+        <div aria-label={chartLabel} className="chart-container mt-4 h-44 w-full" role="img">
           <ResponsiveContainer height="100%" width="100%">
             <LineChart data={chartData} margin={{ left: -20, right: 12, top: 8, bottom: 0 }}>
-              <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" vertical={false} />
-              <XAxis axisLine={false} dataKey="dateLabel" fontSize={11} tickLine={false} />
+              <CartesianGrid stroke="#f1f5f9" strokeDasharray="3 3" vertical={false} />
+              <XAxis axisLine={false} dataKey="dateLabel" fontSize={11} stroke="#64748b" tickLine={false} />
               <YAxis
                 axisLine={false}
                 domain={["dataMin - 5", "dataMax + 5"]}
                 fontSize={11}
+                stroke="#64748b"
                 tickLine={false}
               />
               <Tooltip
                 contentStyle={{
-                  border: "1px solid #cbd5e1",
-                  borderRadius: 12,
-                  boxShadow: "0 8px 24px rgba(15, 23, 42, .08)",
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: 10,
+                  boxShadow: "0 4px 12px rgba(15, 23, 42, .06)",
                   fontSize: 12,
                 }}
                 formatter={(value) => [
@@ -136,39 +138,39 @@ function MeasurementCard({
                 ]}
               />
               <Line
-                activeDot={{ r: 5 }}
+                activeDot={{ r: 4.5 }}
                 animationBegin={100}
-                animationDuration={1200}
+                animationDuration={1000}
                 animationEasing="ease-out"
                 dataKey="value"
-                dot={{ fill: "#0f766e", r: 3.5, strokeWidth: 0 }}
+                dot={{ fill: "#334155", r: 3, strokeWidth: 0 }}
                 isAnimationActive={true}
-                stroke="#0f766e"
-                strokeWidth={2.5}
+                stroke="#334155"
+                strokeWidth={2}
                 type="monotone"
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
       ) : (
-        <div className="mt-5 flex h-32 items-center justify-center rounded-xl border border-dashed border-slate-300 text-sm text-slate-500">
-          <ChartNoAxesCombined className="mr-2 size-5" aria-hidden />
+        <div className="mt-4 flex h-32 items-center justify-center rounded-xl border border-dashed border-slate-200 text-xs text-slate-400">
+          <ChartNoAxesCombined className="mr-2 size-4" aria-hidden />
           추세를 계산하려면 측정값이 더 필요합니다.
         </div>
       )}
 
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="mt-3.5 flex flex-wrap gap-2 pt-3 border-t border-slate-100">
         {measurement.points.slice(-4).map((point) => {
           const abnormal = Boolean(
             point.abnormalFlag && point.abnormalFlag !== "NORMAL",
           );
           const pointClass = abnormal
-            ? "border-amber-200 bg-amber-50 text-amber-900"
-            : "border-slate-200 bg-white text-slate-700";
+            ? "border-amber-200 bg-amber-50/80 text-amber-900"
+            : "border-slate-200 bg-slate-50/70 text-slate-700 hover:bg-slate-100";
           return (
             <button
               className={
-                "rounded-lg border px-2.5 py-2 text-left text-xs transition hover:border-teal-400 " +
+                "rounded-lg border px-2.5 py-1.5 text-left text-xs transition " +
                 pointClass
               }
               data-evidence-target="true"
@@ -177,12 +179,12 @@ function MeasurementCard({
               onClick={() => onEvidence(point.evidenceId)}
               type="button"
             >
-              <span className="block text-[11px] text-slate-500">
+              <span className="block text-[10px] text-slate-400">
                 {formatDate(point.occurredAt)}
               </span>
-              <span className="mt-0.5 block font-black">
+              <span className="mt-0.5 block font-semibold text-xs">
                 {point.value} {measurement.unit}
-                {abnormal && <span className="ml-1 font-bold">· 범위 밖</span>}
+                {abnormal && <span className="ml-1 text-[10px] font-bold text-amber-700">· 범위 밖</span>}
               </span>
             </button>
           );

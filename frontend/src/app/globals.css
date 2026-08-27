@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f4f7f8;
-  --foreground: #162a32;
+  --background: #f8fafc;
+  --foreground: #0f172a;
 }
 
 * {
@@ -19,8 +19,9 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family:
-    Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", Inter, ui-sans-serif,
-    system-ui, sans-serif;
+    Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR",
+    sans-serif;
+  letter-spacing: -0.01em;
 }
 
 button,
@@ -42,33 +43,33 @@ select:not(:disabled) {
 }
 
 ::selection {
-  background: #99f6e4;
-  color: #102a33;
+  background: #e2e8f0;
+  color: #0f172a;
 }
 
 @layer components {
   .card {
-    @apply rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)];
+    @apply rounded-2xl border border-slate-200/80 bg-white shadow-[0_1px_3px_0_rgba(15,23,42,0.03),0_1px_2px_-1px_rgba(15,23,42,0.03)];
   }
 
   .button-primary {
-    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-teal-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-teal-800 focus-visible:outline-2 focus-visible:outline-teal-600 disabled:cursor-not-allowed disabled:opacity-55;
+    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-slate-900 disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .button-secondary {
-    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-teal-600 disabled:cursor-not-allowed disabled:opacity-55;
+    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-slate-900 disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .field {
-    @apply min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 transition placeholder:text-slate-400 focus:border-teal-600 focus:outline-none focus:ring-3 focus:ring-teal-100;
+    @apply min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm text-slate-900 transition placeholder:text-slate-400 focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10;
   }
 
   .badge {
-    @apply inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-bold;
+    @apply inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-semibold;
   }
 
   .section-title {
-    @apply text-base font-black tracking-tight text-slate-900;
+    @apply text-base font-bold tracking-tight text-slate-900;
   }
 }
 
@@ -83,9 +84,9 @@ select:not(:disabled) {
 @keyframes evidence-flash {
   0%,
   35% {
-    border-color: #0d9488;
-    background: #ccfbf1;
-    box-shadow: 0 0 0 4px rgb(20 184 166 / 0.17);
+    border-color: #334155;
+    background: #f1f5f9;
+    box-shadow: 0 0 0 4px rgba(51, 65, 85, 0.12);
   }
   100% {
     border-color: inherit;
@@ -98,7 +99,7 @@ select:not(:disabled) {
 @keyframes chart-fade-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -107,28 +108,26 @@ select:not(:disabled) {
 }
 
 .chart-container {
-  animation: chart-fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: chart-fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .recharts-line-curve {
-  transition: stroke-width 0.25s ease, filter 0.25s ease;
+  transition: stroke-width 0.2s ease;
 }
 
 .recharts-line-curve:hover {
-  stroke-width: 3.5px !important;
-  filter: drop-shadow(0 0 6px rgba(15, 118, 110, 0.45));
+  stroke-width: 3px !important;
 }
 
 .recharts-dot {
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), fill 0.2s ease, r 0.25s ease;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), fill 0.2s ease, r 0.2s ease;
   transform-box: fill-box;
   transform-origin: center;
 }
 
 .recharts-dot:hover {
-  transform: scale(1.6);
-  fill: #0d9488 !important;
-  filter: drop-shadow(0 0 5px rgba(13, 148, 136, 0.6));
+  transform: scale(1.4);
+  fill: #0f172a !important;
 }
 
 .recharts-active-dot circle {
@@ -141,8 +140,9 @@ select:not(:disabled) {
     opacity: 1;
   }
   50% {
-    r: 7.5px;
-    opacity: 0.85;
+    r: 6.5px;
+    opacity: 0.9;
   }
 }
+
 
