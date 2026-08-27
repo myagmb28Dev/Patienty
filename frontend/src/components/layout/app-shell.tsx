@@ -152,10 +152,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <ShieldCheck className="size-5 text-teal-600" aria-label="인증됨" />
             </div>
           </div>
-          <div className="flex items-center gap-2 border-t border-amber-200 bg-amber-50 px-4 py-2 text-xs font-semibold text-amber-900 sm:px-6 lg:px-8">
-            <span className="rounded bg-amber-200 px-1.5 py-0.5 font-black">DEMO</span>
-            이 서비스의 모든 환자와 의료 기록은 시연을 위해 생성된 가상 데이터입니다.
-          </div>
         </header>
         <main className="mx-auto max-w-[1600px] p-4 sm:p-6 lg:p-8">
           {children}

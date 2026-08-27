@@ -194,7 +194,7 @@ export function DashboardPage() {
               <div>
                 <h2 className="section-title">최근 확인한 환자</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  이 브라우저에서 최근 열어본 가상 환자 목록입니다.
+                  최근 조회한 환자 바로가기 목록입니다.
                 </p>
               </div>
               <Link className="text-sm font-bold text-teal-700 hover:text-teal-900" href="/patients">

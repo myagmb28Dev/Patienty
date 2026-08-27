@@ -2,14 +2,14 @@
 
 import {
   AlertCircle,
-  Bot,
   ExternalLink,
+  FileSearch,
+  FileText,
   LoaderCircle,
   MessageSquareText,
   RotateCcw,
   Send,
   ShieldAlert,
-  Sparkles,
 } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { patientsApi } from "@/lib/api/client";
@@ -50,7 +50,7 @@ export function AiAssistant({
       setError(
         caught instanceof Error
           ? caught.message
-          : "AI 답변을 생성하지 못했습니다. 원본 기록은 계속 확인하실 수 있습니다.",
+          : "기록 요약 조회를 완료하지 못했습니다. 원본 기록은 계속 확인하실 수 있습니다.",
       );
     } finally {
       setLoading(false);
@@ -67,11 +67,11 @@ export function AiAssistant({
       <header className="border-b border-slate-200 bg-[#102a33] p-5 text-white">
         <div className="flex items-center gap-3">
           <div className="grid size-10 place-items-center rounded-xl bg-teal-400 text-slate-950">
-            <Bot className="size-6" aria-hidden />
+            <FileSearch className="size-5" aria-hidden />
           </div>
           <div>
-            <h2 className="font-black">AI Assistant</h2>
-            <p className="text-xs text-slate-300">근거 기록을 기반으로 답변합니다</p>
+            <h2 className="font-black">임상 기록 질의</h2>
+            <p className="text-xs text-slate-300">진료·검사·처방 기록 기반 데이터 검색</p>
           </div>
         </div>
       </header>
@@ -79,18 +79,18 @@ export function AiAssistant({
       <div className="flex-1 space-y-5 overflow-y-auto p-4 sm:p-5">
         {!response && !loading && !error && (
           <div>
-            <div className="rounded-2xl bg-teal-50 p-4">
-              <Sparkles className="size-5 text-teal-700" aria-hidden />
+            <div className="rounded-2xl border border-teal-100 bg-teal-50/70 p-4">
+              <FileText className="size-5 text-teal-700" aria-hidden />
               <p className="mt-2 text-sm font-bold text-slate-900">
-                어떤 기록을 확인하시겠습니까?
+                확인할 임상 항목을 선택하세요
               </p>
               <p className="mt-1 text-xs leading-5 text-slate-600">
-                아래 추천 질문을 선택하거나 직접 입력해 주세요. 진단 및 치료 권고는 제공하지 않습니다.
+                아래 주요 조회 항목을 선택하거나 직접 검색어를 입력해 주세요. 진단 및 치료 권고는 제공하지 않습니다.
               </p>
             </div>
             <div className="mt-4 space-y-2">
               <p className="text-xs font-black uppercase tracking-wide text-slate-400">
-                추천 질문
+                주요 조회 항목
               </p>
               {suggestedQuestions.map((suggestion) => (
                 <button
@@ -160,7 +160,7 @@ export function AiAssistant({
         />
         <div className="mt-2 flex items-center justify-between gap-3">
           <p className="text-[11px] leading-4 text-slate-500">
-            AI 설명은 원본 기록을 대신하지 않습니다.
+            조회된 요약은 참고용이며 원본 의무기록을 확인하세요.
           </p>
           <button
             aria-label="질문 보내기"
@@ -204,7 +204,7 @@ function AiAnswer({
         ) : insufficient ? (
           <AlertCircle className="size-5 text-amber-700" aria-hidden />
         ) : (
-          <Bot className="size-5 text-teal-700" aria-hidden />
+          <FileText className="size-5 text-teal-700" aria-hidden />
         )}
         <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-800">
           {response.answer}

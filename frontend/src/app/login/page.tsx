@@ -1,12 +1,12 @@
 "use client";
 
 import {
+  Activity,
   ArrowRight,
   ClipboardList,
   HeartPulse,
   LoaderCircle,
   Pill,
-  Sparkles,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useEffect, useState } from "react";
@@ -123,7 +123,7 @@ export default function LoginPage() {
         </div>
         <div className="relative max-w-xl">
           <span className="inline-flex items-center gap-2 rounded-full border border-teal-300/20 bg-teal-300/10 px-3 py-1.5 text-sm font-bold text-teal-200">
-            <Sparkles className="size-4" aria-hidden />
+            <Activity className="size-4" aria-hidden />
             환자의 변화를 10초 안에
           </span>
           <h1 className="mt-6 text-5xl font-black leading-[1.15] tracking-tight">
@@ -134,7 +134,7 @@ export default function LoginPage() {
           <p className="mt-6 max-w-lg text-lg leading-8 text-slate-300">
             진료, 검사, 처방 기록을 한눈에 정리하고
             <br />
-            모든 AI 설명을 원본 근거까지 연결합니다.
+            모든 요약과 분석을 원본 근거 기록까지 연결합니다.
           </p>
         </div>
         <div className="relative grid grid-cols-3 gap-3 text-sm">

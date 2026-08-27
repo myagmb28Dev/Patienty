@@ -145,9 +145,6 @@ export function PatientDetailPage() {
                 <h1 className="text-3xl font-black tracking-tight text-slate-950">
                   {detail.header.name}
                 </h1>
-                <span className="badge border-amber-200 bg-amber-50 text-amber-800">
-                  합성 환자
-                </span>
               </div>
               <p className="mt-1 text-sm font-semibold text-slate-500">
                 {detail.header.age}세 · {formatSex(detail.header.sexCode)} ·{" "}
@@ -308,17 +305,17 @@ function SummaryCard({
 
   return (
     <section className="card overflow-hidden">
-      <div className="border-b border-teal-100 bg-gradient-to-r from-teal-50 to-cyan-50 p-5 sm:p-6">
-        <div className="flex items-center gap-2 text-sm font-black text-teal-800">
-          <Activity className="size-5" aria-hidden />
-          10초 환자 요약
+      <div className="border-b border-slate-200 bg-slate-50/80 p-5 sm:p-6">
+        <div className="flex items-center gap-2 text-sm font-black text-slate-800">
+          <Activity className="size-5 text-teal-700" aria-hidden />
+          임상 경과 요약
         </div>
-        <p className="mt-4 text-lg font-bold leading-8 text-slate-900">
+        <p className="mt-3 text-lg font-bold leading-8 text-slate-900">
           {detail.summary.text || "사용 가능한 요약 기록이 없습니다."}
         </p>
       </div>
       <div className="p-5 sm:p-6">
-        <h3 className="text-sm font-black text-slate-900">주의해서 볼 변화</h3>
+        <h3 className="text-sm font-black text-slate-900">주요 관찰 및 임상적 변화</h3>
         {observations.length === 0 ? (
           <div className="mt-3 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800">
             <CheckCircle2 className="size-5" aria-hidden />
