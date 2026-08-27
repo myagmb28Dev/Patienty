@@ -125,17 +125,17 @@ export default function LoginPage() {
           <p className="text-xl font-bold tracking-tight text-white">Patienty</p>
         </div>
 
-        <div className="relative max-w-lg">
+        <div className="relative max-w-xl">
           <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/80 px-3.5 py-1.5 text-xs font-medium text-slate-300">
             <Activity className="size-3.5 text-slate-300" aria-hidden />
             환자의 변화를 10초 안에
           </span>
-          <h1 className="mt-6 text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl">
+          <h1 className="mt-6 text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl xl:text-5xl break-keep">
             흩어진 기록을 모아
             <br />
             중요한 변화부터 확인하세요.
           </h1>
-          <p className="mt-5 text-base leading-relaxed text-slate-400">
+          <p className="mt-5 text-base leading-relaxed text-slate-400 break-keep">
             진료, 검사, 처방 기록을 한눈에 정리하고
             <br />
             모든 요약과 분석을 원본 근거 기록까지 연결합니다.
