@@ -137,18 +137,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Menu className="size-5" />
             </button>
             <Link
-              className="hidden max-w-md flex-1 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500 transition hover:border-teal-400 hover:bg-white sm:flex"
+              className="hidden max-w-md flex-1 items-center gap-2 rounded-xl border border-slate-200/90 bg-slate-50/80 px-3.5 py-2 text-sm text-slate-400 transition hover:border-slate-300 hover:bg-white hover:text-slate-600 sm:flex"
               href="/patients"
             >
-              <Search className="size-4" aria-hidden />
+              <Search className="size-4 text-slate-400" aria-hidden />
               이름 또는 환자번호로 찾기
             </Link>
-            <div className="ml-auto flex items-center gap-2 text-right">
+            <div className="ml-auto flex items-center gap-3 text-right">
               <div className="hidden sm:block">
-                <p className="text-sm font-bold text-slate-800">{clinician.name}</p>
-                <p className="text-xs text-slate-500">{clinician.email}</p>
+                <p className="text-sm font-bold text-slate-900">{clinician.name}</p>
+                <p className="text-xs text-slate-400">{clinician.email}</p>
               </div>
-              <ShieldCheck className="size-5 text-teal-600" aria-label="인증됨" />
+              <ShieldCheck className="size-5 text-slate-700" aria-label="인증됨" />
             </div>
           </div>
         </header>

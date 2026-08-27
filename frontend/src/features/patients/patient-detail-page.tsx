@@ -181,8 +181,8 @@ export function PatientDetailPage() {
       )}
 
       {evidenceNotice && (
-        <div className="flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700" role="status">
-          <ExternalLink className="size-4 text-teal-700" aria-hidden />
+        <div className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-2xs" role="status">
+          <ExternalLink className="size-4 text-slate-700" aria-hidden />
           {evidenceNotice}
         </div>
       )}

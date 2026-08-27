@@ -65,50 +65,50 @@ export function AiAssistant({
   };
 
   return (
-    <aside className="card flex min-h-[620px] flex-col overflow-hidden xl:sticky xl:top-24 xl:max-h-[calc(100vh-8rem)]">
-      <header className="border-b border-slate-800 bg-slate-900 p-5 text-white">
+    <aside className="card flex h-[calc(100vh-6rem)] flex-col overflow-hidden xl:sticky xl:top-20">
+      <header className="shrink-0 border-b border-slate-800 bg-slate-900 p-4 text-white">
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-3">
-            <div className="grid size-9 place-items-center rounded-xl bg-slate-800 border border-slate-700 text-slate-200">
-              <FileSearch className="size-4.5" aria-hidden />
+          <div className="flex items-center gap-2.5">
+            <div className="grid size-8 place-items-center rounded-lg bg-slate-800 border border-slate-700 text-slate-200">
+              <FileSearch className="size-4" aria-hidden />
             </div>
             <div>
               <h2 className="text-sm font-bold tracking-tight text-white">임상 의무기록 조회</h2>
-              <p className="text-xs text-slate-400">진료·검사·처방 기반 요약 검색</p>
+              <p className="text-[11px] text-slate-400">진료·검사·처방 기반 요약 검색</p>
             </div>
           </div>
-          <span className="badge border-slate-700 bg-slate-800/80 text-[11px] font-medium text-slate-300">
+          <span className="badge border-slate-700 bg-slate-800/80 text-[10px] font-medium text-slate-300">
             데이터 분석
           </span>
         </div>
       </header>
 
-      <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-5">
+      <div className="min-h-0 flex-1 space-y-3.5 overflow-y-auto p-4">
         {!response && !loading && !error && (
-          <div className="space-y-4">
-            <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-4">
+          <div className="space-y-3">
+            <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-3.5">
               <p className="text-xs font-bold text-slate-800">
                 의무기록 항목별 빠른 조회
               </p>
-              <p className="mt-1 text-xs leading-relaxed text-slate-500">
-                조회할 항목을 선택하거나 하단에 질문을 입력하면 진료·검사·처방 데이터를 분석하여 핵심 요약과 원본 근거를 제공합니다.
+              <p className="mt-1 text-[11px] leading-relaxed text-slate-500">
+                조회할 항목을 선택하거나 하단에 검색어를 입력하면 환자의 진료·검사·처방 기록을 분석하여 핵심 요약과 원본 근거를 제공합니다.
               </p>
             </div>
-            <div className="space-y-2">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+            <div className="space-y-1.5">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                 주요 조회 항목
               </p>
               {suggestedQueries.map(({ label, icon: Icon, query }) => (
                 <button
-                  className="flex w-full items-center gap-3 rounded-xl border border-slate-200/90 bg-white p-3 text-left transition hover:border-slate-300 hover:bg-slate-50/80 shadow-2xs"
+                  className="flex w-full items-center gap-2.5 rounded-lg border border-slate-200/90 bg-white p-2.5 text-left transition hover:border-slate-300 hover:bg-slate-50 shadow-2xs"
                   key={query}
                   onClick={() => void ask(query)}
                   type="button"
                 >
-                  <div className="grid size-7 shrink-0 place-items-center rounded-lg bg-slate-100 text-slate-600">
-                    <Icon className="size-3.5" aria-hidden />
+                  <div className="grid size-6 shrink-0 place-items-center rounded-md bg-slate-100 text-slate-600">
+                    <Icon className="size-3" aria-hidden />
                   </div>
-                  <span className="text-xs font-semibold text-slate-700">{label}</span>
+                  <span className="text-xs font-medium text-slate-700">{label}</span>
                 </button>
               ))}
             </div>
@@ -148,13 +148,13 @@ export function AiAssistant({
         )}
       </div>
 
-      <form className="border-t border-slate-200/80 bg-slate-50/80 p-4" onSubmit={submit}>
+      <form className="shrink-0 border-t border-slate-200/80 bg-slate-50/95 p-3.5" onSubmit={submit}>
         <label className="sr-only" htmlFor="patient-question">
           임상 의무기록 검색
         </label>
         <div className="relative">
           <textarea
-            className="field min-h-18 resize-none py-2.5 text-xs sm:text-sm"
+            className="field min-h-16 resize-none py-2 text-xs sm:text-sm"
             id="patient-question"
             maxLength={500}
             onChange={(event) => setQuestion(event.target.value)}
@@ -168,13 +168,13 @@ export function AiAssistant({
             value={question}
           />
         </div>
-        <div className="mt-2.5 flex items-center justify-between gap-3">
-          <p className="text-[11px] text-slate-400">
+        <div className="mt-2 flex items-center justify-between gap-3">
+          <p className="text-[10px] text-slate-400">
             의무기록 기반 참고용 분석
           </p>
           <button
             aria-label="기록 검색"
-            className="button-primary shrink-0 text-xs px-3.5 py-2"
+            className="button-primary shrink-0 text-xs px-3 py-1.5"
             disabled={!question.trim() || loading}
             type="submit"
           >
@@ -200,9 +200,9 @@ function AiAnswer({
   const insufficient = response.status === "INSUFFICIENT_EVIDENCE";
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3.5">
       <div className="flex items-center justify-between">
-        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
           분석 요약 소견
         </span>
         <button
@@ -216,7 +216,7 @@ function AiAnswer({
 
       <div
         className={
-          "rounded-xl border p-4 shadow-2xs " +
+          "rounded-xl border p-3.5 shadow-2xs " +
           (unsupported
             ? "border-slate-200 bg-slate-50/80"
             : insufficient
@@ -224,17 +224,17 @@ function AiAnswer({
               : "border-slate-200 bg-white")
         }
       >
-        <div className="flex items-center gap-2 mb-2 text-xs font-bold text-slate-700">
+        <div className="flex items-center gap-2 mb-1.5 text-xs font-bold text-slate-700">
           {unsupported ? (
-            <ShieldAlert className="size-4 text-slate-500" aria-hidden />
+            <ShieldAlert className="size-3.5 text-slate-500" aria-hidden />
           ) : insufficient ? (
-            <AlertCircle className="size-4 text-amber-700" aria-hidden />
+            <AlertCircle className="size-3.5 text-amber-700" aria-hidden />
           ) : (
-            <FileText className="size-4 text-slate-600" aria-hidden />
+            <FileText className="size-3.5 text-slate-600" aria-hidden />
           )}
-          <span>임상 기록 소견</span>
+          <span>임상 소견 요약</span>
         </div>
-        <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-800 font-medium">
+        <p className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed text-slate-800 font-medium">
           {response.answer}
         </p>
       </div>
