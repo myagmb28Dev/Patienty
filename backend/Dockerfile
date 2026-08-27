@@ -8,7 +8,7 @@ RUN chmod +x gradlew && sed -i 's/\r$//' gradlew
 RUN ./gradlew dependencies --no-daemon || true
 
 COPY src ./src
-RUN ./gradlew bootJar --no-daemon -x test
+RUN ./gradlew bootJar --no-daemon --parallel --build-cache -x test
 
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app

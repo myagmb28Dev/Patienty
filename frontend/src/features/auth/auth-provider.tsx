@@ -18,26 +18,55 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+const SESSION_HINT_KEY = "patienty:has_session";
+
+function hasSessionHint(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(SESSION_HINT_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function setSessionHint(hasSession: boolean) {
+  if (typeof window === "undefined") return;
+  try {
+    if (hasSession) {
+      window.localStorage.setItem(SESSION_HINT_KEY, "1");
+    } else {
+      window.localStorage.removeItem(SESSION_HINT_KEY);
+    }
+  } catch {
+  }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [clinician, setClinician] = useState<Clinician | null>(null);
   const pathname = usePathname();
   const [status, setStatus] = useState<AuthStatus>(() =>
-    pathname === "/login" ? "unauthenticated" : "loading"
+    pathname === "/login" || !hasSessionHint() ? "unauthenticated" : "loading"
   );
 
   const refresh = useCallback(async () => {
+    if (!hasSessionHint()) {
+      setClinician(null);
+      setStatus("unauthenticated");
+      return;
+    }
     try {
       const current = await authApi.me();
       setClinician(current);
       setStatus("authenticated");
     } catch {
+      setSessionHint(false);
       setClinician(null);
       setStatus("unauthenticated");
     }
   }, []);
 
   useEffect(() => {
-    if (pathname === "/login") {
+    if (pathname === "/login" || !hasSessionHint()) {
       setStatus("unauthenticated");
       return;
     }
@@ -47,6 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const handleUnauthorized = () => {
+      setSessionHint(false);
       setClinician(null);
       setStatus("unauthenticated");
     };
@@ -57,6 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(async (email: string, password: string) => {
     const current = await authApi.login(email, password);
+    setSessionHint(true);
     setClinician(current);
     setStatus("authenticated");
   }, []);
@@ -65,6 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await authApi.logout();
     } finally {
+      setSessionHint(false);
       setClinician(null);
       setStatus("unauthenticated");
       if (clinician) clearRecentPatients(clinician.id);
