@@ -2,5 +2,19 @@ package dev.patienty.assistant;
 import dev.patienty.assistant.AiAnswerGenerator.GeneratedAnswer;import dev.patienty.assistant.AssistantContext.ContextItem;import dev.patienty.assistant.AssistantDtos.AiQueryResponse;import dev.patienty.insight.InsightService;import dev.patienty.patient.PatientDtos.Evidence;import dev.patienty.patient.PatientQueryService;import java.time.*;import java.util.*;import org.springframework.stereotype.Service;import org.springframework.transaction.annotation.Transactional;
 @Service @Transactional(readOnly=true) public class PatientAssistantService{private final IntentResolver resolver;private final ContextBuilder contexts;private final InsightService insights;private final AiAnswerGenerator generator;private final EvidenceValidator validator;private final PatientQueryService patients;private final Clock clock=Clock.systemUTC();
     public PatientAssistantService(IntentResolver resolver,ContextBuilder contexts,InsightService insights,AiAnswerGenerator generator,EvidenceValidator validator,PatientQueryService patients){this.resolver=resolver;this.contexts=contexts;this.insights=insights;this.generator=generator;this.validator=validator;this.patients=patients;}
-    public AiQueryResponse answer(UUID id,String question){patients.requireAssigned(id);AssistantIntent intent=resolver.resolve(question);if(intent==AssistantIntent.UNSUPPORTED)return new AiQueryResponse("UNSUPPORTED_REQUEST","Patienty는 진단, 치료 또는 약물 추천을 제공하지 않습니다. 기록 요약이나 변화 조회를 요청해 주세요.",List.of(),List.of(),clock.instant());AssistantContext context=contexts.build(id,intent,question);if(context.items().isEmpty())return new AiQueryResponse("INSUFFICIENT_EVIDENCE","이 질문에 답할 수 있는 환자 기록이 충분하지 않습니다.",List.of(),List.of(),clock.instant());GeneratedAnswer answer=generator.generate(question,intent,context,insights.summary(id));validator.validate(context,answer.observations());Set<String>cited=new LinkedHashSet<>();answer.observations().forEach(o->cited.addAll(o.evidenceIds()));List<Evidence>evidence=context.items().stream().filter(i->cited.contains(i.evidenceId())).map(PatientAssistantService::evidence).toList();return new AiQueryResponse("ANSWERED",answer.answer(),answer.observations(),evidence,clock.instant());}
+    public AiQueryResponse answer(String identifier,String question){
+        dev.patienty.patient.Patient p=patients.requireAssigned(identifier);
+        UUID id=p.getId();
+        AssistantIntent intent=resolver.resolve(question);
+        if(intent==AssistantIntent.UNSUPPORTED)return new AiQueryResponse("UNSUPPORTED_REQUEST","Patienty는 진단, 치료 또는 약물 추천을 제공하지 않습니다. 기록 요약이나 변화 조회를 요청해 주세요.",List.of(),List.of(),clock.instant());
+        AssistantContext context=contexts.build(id,intent,question);
+        if(context.items().isEmpty())return new AiQueryResponse("INSUFFICIENT_EVIDENCE","이 질문에 답할 수 있는 환자 기록이 충분하지 않습니다.",List.of(),List.of(),clock.instant());
+        GeneratedAnswer answer=generator.generate(question,intent,context,insights.summary(id));
+        validator.validate(context,answer.observations());
+        Set<String>cited=new LinkedHashSet<>();
+        answer.observations().forEach(o->cited.addAll(o.evidenceIds()));
+        List<Evidence>evidence=context.items().stream().filter(i->cited.contains(i.evidenceId())).map(PatientAssistantService::evidence).toList();
+        return new AiQueryResponse("ANSWERED",answer.answer(),answer.observations(),evidence,clock.instant());
+    }
+    public AiQueryResponse answer(UUID id,String question){return answer(id.toString(),question);}
     private static Evidence evidence(ContextItem i){return new Evidence(i.evidenceId(),i.sourceType(),i.occurredAt(),i.label());}}

@@ -29,4 +29,18 @@ public interface PatientRepository extends JpaRepository<Patient, UUID> {
 
     @Query(value = "SELECT p.* FROM patient p JOIN clinician_patient_assignment a ON a.patient_id=p.id WHERE a.clinician_id=:clinicianId AND p.id=:patientId", nativeQuery = true)
     Optional<Patient> findAssignedById(@Param("clinicianId") UUID clinicianId, @Param("patientId") UUID patientId);
+
+    @Query(value = """
+            SELECT p.* FROM patient p
+            JOIN clinician_patient_assignment a ON a.patient_id = p.id
+            WHERE a.clinician_id = :clinicianId
+              AND (
+                (:patientId IS NOT NULL AND p.id = :patientId)
+                OR lower(p.patient_number) = lower(:identifier)
+              )
+            """, nativeQuery = true)
+    Optional<Patient> findAssignedByIdOrNumber(
+            @Param("clinicianId") UUID clinicianId,
+            @Param("patientId") UUID patientId,
+            @Param("identifier") String identifier);
 }

@@ -124,7 +124,7 @@ export function DashboardPage() {
                   {appointments.map((appointment) => (
                     <Link
                       className="group flex items-center gap-4 py-4 first:pt-0 last:pb-0"
-                      href={`/patients/${appointment.patientId}`}
+                      href={`/patients/${appointment.patientNumber || appointment.patientId}`}
                       key={appointment.appointmentId}
                     >
                       <div className="min-w-20 rounded-xl bg-slate-100 px-3 py-2 text-center text-sm font-black text-slate-700">
@@ -167,7 +167,7 @@ export function DashboardPage() {
                   {attentionPatients.map((patient) => (
                     <Link
                       className="group flex items-center gap-3 rounded-xl border border-slate-200 p-3 transition hover:border-teal-300 hover:bg-teal-50/40"
-                      href={`/patients/${patient.id}`}
+                      href={`/patients/${patient.patientNumber || patient.id}`}
                       key={patient.id}
                     >
                       <div className="grid size-10 shrink-0 place-items-center rounded-full bg-slate-100 text-sm font-black text-slate-700">
@@ -211,7 +211,7 @@ export function DashboardPage() {
                 {recent.map((patient) => (
                   <Link
                     className="rounded-xl border border-slate-200 p-4 transition hover:border-teal-300 hover:bg-teal-50/40"
-                    href={`/patients/${patient.id}`}
+                    href={`/patients/${patient.patientNumber || patient.id}`}
                     key={patient.id}
                   >
                     <p className="font-bold text-slate-900">{patient.name}</p>

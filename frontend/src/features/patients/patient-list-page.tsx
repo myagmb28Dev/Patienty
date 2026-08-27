@@ -248,7 +248,7 @@ function PatientRow({ patient }: { patient: PatientListItem }) {
   return (
     <tr className="group transition hover:bg-teal-50/35">
       <td className="px-5 py-4">
-        <Link className="flex items-center gap-3" href={`/patients/${patient.id}`}>
+        <Link className="flex items-center gap-3" href={`/patients/${patient.patientNumber || patient.id}`}>
           <div className="grid size-10 shrink-0 place-items-center rounded-full bg-slate-100 text-sm font-black text-slate-700 group-hover:bg-teal-100 group-hover:text-teal-800">
             {patient.name.slice(0, 1)}
           </div>
@@ -274,7 +274,7 @@ function PatientRow({ patient }: { patient: PatientListItem }) {
         <Link
           aria-label={`${patient.name} 상세 열기`}
           className="grid size-9 place-items-center rounded-lg text-slate-400 hover:bg-teal-100 hover:text-teal-800"
-          href={`/patients/${patient.id}`}
+          href={`/patients/${patient.patientNumber || patient.id}`}
         >
           <ArrowRight className="size-4" />
         </Link>
@@ -285,7 +285,7 @@ function PatientRow({ patient }: { patient: PatientListItem }) {
 
 function PatientCard({ patient }: { patient: PatientListItem }) {
   return (
-    <Link className="block p-4 hover:bg-teal-50/35" href={`/patients/${patient.id}`}>
+    <Link className="block p-4 hover:bg-teal-50/35" href={`/patients/${patient.patientNumber || patient.id}`}>
       <div className="flex items-start gap-3">
         <div className="grid size-10 place-items-center rounded-full bg-slate-100">
           <UserRound className="size-5 text-slate-600" aria-hidden />

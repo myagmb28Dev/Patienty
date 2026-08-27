@@ -8,15 +8,13 @@ import {
   LoaderCircle,
   Pill,
 } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useAuth } from "@/features/auth/auth-provider";
 import { ApiError } from "@/lib/api/client";
-import { safeInternalPath } from "@/lib/navigation";
 
 function LoginForm() {
   const router = useRouter();
-  const params = useSearchParams();
   const { login, status } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,9 +23,9 @@ function LoginForm() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      router.replace(safeInternalPath(params.get("next")));
+      router.replace("/");
     }
-  }, [params, router, status]);
+  }, [router, status]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -36,7 +34,7 @@ function LoginForm() {
 
     try {
       await login(email.trim(), password);
-      router.replace(safeInternalPath(params.get("next")));
+      router.replace("/");
     } catch (caught) {
       setError(
         caught instanceof ApiError && caught.status === 401

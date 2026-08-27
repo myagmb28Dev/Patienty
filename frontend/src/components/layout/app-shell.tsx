@@ -31,10 +31,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isLogin && status === "unauthenticated") {
-      const next = encodeURIComponent(pathname || "/");
-      router.replace(`/login?next=${next}`);
+      router.replace("/login");
     }
-  }, [isLogin, pathname, router, status]);
+  }, [isLogin, router, status]);
 
   if (isLogin) return <>{children}</>;
   if (status === "loading") return <PageLoader label="의료진 세션을 확인하는 중" />;
