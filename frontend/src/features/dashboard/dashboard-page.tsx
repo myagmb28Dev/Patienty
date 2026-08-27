@@ -149,11 +149,16 @@ export function DashboardPage() {
             </section>
 
             <section className="card p-5 sm:p-6">
-              <div className="mb-5">
-                <h2 className="section-title">변화 검토 필요</h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  진단이 아닌, 기록상 변화가 감지된 담당 환자입니다.
-                </p>
+              <div className="mb-5 flex items-center justify-between">
+                <div>
+                  <h2 className="section-title">변화 검토 필요</h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    진단이 아닌, 기록상 변화가 감지된 담당 환자입니다.
+                  </p>
+                </div>
+                <span className="badge border-teal-200 bg-teal-50 text-xs font-bold text-teal-800">
+                  AI 변화 감지
+                </span>
               </div>
               {loading ? (
                 <SectionSkeleton rows={4} />

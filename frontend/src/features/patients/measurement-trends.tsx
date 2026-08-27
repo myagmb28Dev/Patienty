@@ -112,7 +112,7 @@ function MeasurementCard({
       </div>
 
       {chartData.length >= 2 ? (
-        <div aria-label={chartLabel} className="mt-5 h-48 w-full" role="img">
+        <div aria-label={chartLabel} className="chart-container mt-5 h-48 w-full" role="img">
           <ResponsiveContainer height="100%" width="100%">
             <LineChart data={chartData} margin={{ left: -20, right: 12, top: 8, bottom: 0 }}>
               <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" vertical={false} />
@@ -137,8 +137,12 @@ function MeasurementCard({
               />
               <Line
                 activeDot={{ r: 5 }}
+                animationBegin={100}
+                animationDuration={1200}
+                animationEasing="ease-out"
                 dataKey="value"
-                dot={{ fill: "#0f766e", r: 3, strokeWidth: 0 }}
+                dot={{ fill: "#0f766e", r: 3.5, strokeWidth: 0 }}
+                isAnimationActive={true}
                 stroke="#0f766e"
                 strokeWidth={2.5}
                 type="monotone"

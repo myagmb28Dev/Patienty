@@ -65,14 +65,19 @@ export function AiAssistant({
   return (
     <aside className="card flex min-h-[620px] flex-col overflow-hidden xl:sticky xl:top-32 xl:max-h-[calc(100vh-9rem)]">
       <header className="border-b border-slate-200 bg-[#102a33] p-5 text-white">
-        <div className="flex items-center gap-3">
-          <div className="grid size-10 place-items-center rounded-xl bg-teal-400 text-slate-950">
-            <FileSearch className="size-5" aria-hidden />
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-3">
+            <div className="grid size-10 place-items-center rounded-xl bg-teal-400 text-slate-950">
+              <FileSearch className="size-5" aria-hidden />
+            </div>
+            <div>
+              <h2 className="font-black">AI 임상 기록 질의</h2>
+              <p className="text-xs text-slate-300">의무기록 기반 AI 데이터 분석 및 근거 검색</p>
+            </div>
           </div>
-          <div>
-            <h2 className="font-black">임상 기록 질의</h2>
-            <p className="text-xs text-slate-300">진료·검사·처방 기록 기반 데이터 검색</p>
-          </div>
+          <span className="badge border-teal-400/40 bg-teal-500/20 text-xs font-bold text-teal-200">
+            AI 분석 기능
+          </span>
         </div>
       </header>
 
@@ -82,10 +87,10 @@ export function AiAssistant({
             <div className="rounded-2xl border border-teal-100 bg-teal-50/70 p-4">
               <FileText className="size-5 text-teal-700" aria-hidden />
               <p className="mt-2 text-sm font-bold text-slate-900">
-                확인할 임상 항목을 선택하세요
+                확인할 임상 항목을 선택하세요 (AI 분석)
               </p>
               <p className="mt-1 text-xs leading-5 text-slate-600">
-                아래 주요 조회 항목을 선택하거나 직접 검색어를 입력해 주세요. 진단 및 치료 권고는 제공하지 않습니다.
+                주요 조회 항목을 선택하거나 질문을 입력하면 환자의 진료·검사·처방 기록을 AI가 분석하여 답변과 원본 근거를 연결합니다.
               </p>
             </div>
             <div className="mt-4 space-y-2">

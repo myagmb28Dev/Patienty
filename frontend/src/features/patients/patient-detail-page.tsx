@@ -306,16 +306,26 @@ function SummaryCard({
   return (
     <section className="card overflow-hidden">
       <div className="border-b border-slate-200 bg-slate-50/80 p-5 sm:p-6">
-        <div className="flex items-center gap-2 text-sm font-black text-slate-800">
-          <Activity className="size-5 text-teal-700" aria-hidden />
-          임상 경과 요약
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm font-black text-slate-800">
+            <Activity className="size-5 text-teal-700" aria-hidden />
+            임상 경과 요약
+          </div>
+          <span className="badge border-teal-200 bg-teal-50 text-xs font-bold text-teal-800">
+            AI 분석 요약
+          </span>
         </div>
         <p className="mt-3 text-lg font-bold leading-8 text-slate-900">
           {detail.summary.text || "사용 가능한 요약 기록이 없습니다."}
         </p>
       </div>
       <div className="p-5 sm:p-6">
-        <h3 className="text-sm font-black text-slate-900">주요 관찰 및 임상적 변화</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-black text-slate-900">주요 관찰 및 임상적 변화</h3>
+          <span className="badge border-amber-200 bg-amber-50 text-[11px] font-bold text-amber-800">
+            AI 이상 변화 감지
+          </span>
+        </div>
         {observations.length === 0 ? (
           <div className="mt-3 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800">
             <CheckCircle2 className="size-5" aria-hidden />
