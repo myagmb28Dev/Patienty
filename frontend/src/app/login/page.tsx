@@ -163,10 +163,7 @@ export default function LoginPage() {
             <p className="text-2xl font-black text-slate-900">Patienty</p>
           </div>
           <div className="card p-6 sm:p-9">
-            <span className="badge border-amber-200 bg-amber-50 text-amber-800">
-              합성 데이터 전용 데모
-            </span>
-            <h2 className="mt-5 text-3xl font-black tracking-tight text-slate-950">
+            <h2 className="text-3xl font-black tracking-tight text-slate-950">
               의료진 로그인
             </h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
