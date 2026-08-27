@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
-import { authApi, ApiError } from "@/lib/api/client";
+import { authApi } from "@/lib/api/client";
 import type { Clinician } from "@/lib/api/types";
 import { clearRecentPatients } from "@/lib/recent-patients";
 
@@ -67,7 +67,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (pathname === "/login" || !hasSessionHint()) {
-      setStatus("unauthenticated");
       return;
     }
     const frame = window.requestAnimationFrame(() => void refresh());
