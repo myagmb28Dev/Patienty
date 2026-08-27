@@ -11,6 +11,7 @@ RUN npm ci
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+RUN mkdir -p /app/public
 
 # Build-time environment variable for backend API URL
 ARG NEXT_PUBLIC_API_BASE_URL
