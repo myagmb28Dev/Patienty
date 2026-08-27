@@ -50,8 +50,24 @@ async function getServices() {
   return (await res.json()).map((item) => item.service);
 }
 
-async function updateServiceEnvVars(serviceId, serviceName, envVars) {
-  const payload = Object.entries(envVars).map(([key, value]) => ({
+async function getExistingEnvVars(serviceId) {
+  const res = await fetch(`https://api.render.com/v1/services/${serviceId}/env-vars`, {
+    headers: authHeader,
+  });
+  if (!res.ok) return {};
+  const list = await res.json();
+  const map = {};
+  for (const item of list) {
+    map[item.envVar.key] = item.envVar.value;
+  }
+  return map;
+}
+
+async function updateServiceEnvVars(serviceId, serviceName, newVars) {
+  const existing = await getExistingEnvVars(serviceId);
+  const merged = { ...existing, ...newVars };
+
+  const payload = Object.entries(merged).map(([key, value]) => ({
     key,
     value: String(value),
   }));
@@ -66,7 +82,7 @@ async function updateServiceEnvVars(serviceId, serviceName, envVars) {
     throw new Error(`Failed to update env vars for ${serviceName} (${serviceId}): ${res.status} ${await res.text()}`);
   }
 
-  console.log(`[Render Sync] Successfully updated ${payload.length} environment variables for ${serviceName}.`);
+  console.log(`[Render Sync] Successfully merged and updated ${payload.length} environment variables for ${serviceName}.`);
 }
 
 async function run() {
@@ -96,7 +112,7 @@ async function run() {
       await updateServiceEnvVars(frontend.id, frontend.name, frontendVars);
     }
 
-    console.log("[Render Sync] All environment variables are synchronized with Render.");
+    console.log("[Render Sync] All environment variables safely synchronized with Render.");
   } catch (error) {
     console.error("[Render Sync] Error:", error.message);
   }
