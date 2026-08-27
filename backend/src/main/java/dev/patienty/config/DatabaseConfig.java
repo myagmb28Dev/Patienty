@@ -25,7 +25,6 @@ public class DatabaseConfig {
         String username = rawUsername;
         String password = rawPassword;
 
-        // Render나 Heroku의 postgres:// 또는 postgresql:// 표준 URI 포맷을 JDBC URL 포맷으로 자동 변환
         if (StringUtils.hasText(url) && (url.startsWith("postgres://") || url.startsWith("postgresql://"))) {
             try {
                 URI uri = new URI(url);
