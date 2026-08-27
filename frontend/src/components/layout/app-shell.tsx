@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Activity,
   ChevronRight,
   LayoutDashboard,
   LogOut,
@@ -48,14 +47,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const nav = (
     <>
-      <div className="flex h-20 items-center gap-3 border-b border-white/10 px-5">
-        <div className="grid size-10 place-items-center rounded-xl bg-teal-400 text-slate-950">
-          <Activity className="size-6" strokeWidth={2.5} aria-hidden />
-        </div>
-        <div>
-          <p className="text-lg font-black tracking-tight text-white">Patienty</p>
-          <p className="text-xs text-slate-400">Clinical Context Copilot</p>
-        </div>
+      <div className="flex h-20 items-center border-b border-white/10 px-5">
+        <p className="text-xl font-black tracking-tight text-white">Patienty</p>
       </div>
       <nav className="flex-1 space-y-1 p-3" aria-label="주요 메뉴">
         {navigation.map(({ href, label, icon: Icon }) => {

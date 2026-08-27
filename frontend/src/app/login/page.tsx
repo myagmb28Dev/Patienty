@@ -1,12 +1,11 @@
 "use client";
 
 import {
-  Activity,
   ArrowRight,
-  Database,
+  ClipboardList,
+  HeartPulse,
   LoaderCircle,
-  LockKeyhole,
-  ShieldCheck,
+  Pill,
   Sparkles,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -62,7 +61,7 @@ function LoginForm() {
           className="field"
           id="email"
           onChange={(event) => setEmail(event.target.value)}
-          placeholder="doctor.kim@patienty.local"
+          placeholder="이메일을 입력하세요"
           required
           type="email"
           value={email}
@@ -109,11 +108,6 @@ function LoginForm() {
           </>
         )}
       </button>
-      <p className="text-center text-xs leading-5 text-slate-500">
-        시연 계정은 프로젝트 README에서 확인하실 수 있습니다.
-        <br />
-        인증 정보는 브라우저 저장소에 보관되지 않습니다.
-      </p>
     </form>
   );
 }
@@ -124,14 +118,8 @@ export default function LoginPage() {
       <section className="relative hidden overflow-hidden bg-[#102a33] p-12 text-white lg:flex lg:flex-col lg:justify-between">
         <div className="absolute -right-32 -top-28 size-96 rounded-full bg-teal-400/10" />
         <div className="absolute -bottom-40 -left-24 size-[30rem] rounded-full bg-cyan-300/10" />
-        <div className="relative flex items-center gap-3">
-          <div className="grid size-11 place-items-center rounded-xl bg-teal-400 text-slate-950">
-            <Activity className="size-7" strokeWidth={2.5} aria-hidden />
-          </div>
-          <div>
-            <p className="text-xl font-black">Patienty</p>
-            <p className="text-xs text-slate-400">Clinical Context Copilot</p>
-          </div>
+        <div className="relative">
+          <p className="text-2xl font-black tracking-tight text-white">Patienty</p>
         </div>
         <div className="relative max-w-xl">
           <span className="inline-flex items-center gap-2 rounded-full border border-teal-300/20 bg-teal-300/10 px-3 py-1.5 text-sm font-bold text-teal-200">
@@ -144,17 +132,18 @@ export default function LoginPage() {
             중요한 변화부터 확인하세요.
           </h1>
           <p className="mt-6 max-w-lg text-lg leading-8 text-slate-300">
-            진료, 검사, 처방 기록을 한눈에 정리하고 모든 AI 설명을 원본
-            근거까지 연결합니다.
+            진료, 검사, 처방 기록을 한눈에 정리하고
+            <br />
+            모든 AI 설명을 원본 근거까지 연결합니다.
           </p>
         </div>
         <div className="relative grid grid-cols-3 gap-3 text-sm">
           {[
-            [Database, "구조화 기록"],
-            [ShieldCheck, "근거 연결"],
-            [LockKeyhole, "세션 보호"],
+            [ClipboardList, "임상 진료 기록"],
+            [HeartPulse, "검사 수치 추이"],
+            [Pill, "약물 처방 내역"],
           ].map(([Icon, label]) => {
-            const FeatureIcon = Icon as typeof Database;
+            const FeatureIcon = Icon as typeof ClipboardList;
             return (
               <div
                 className="rounded-xl border border-white/10 bg-white/5 p-3"
@@ -171,10 +160,7 @@ export default function LoginPage() {
       <section className="flex items-center justify-center p-5 sm:p-10">
         <div className="w-full max-w-md">
           <div className="mb-7 flex items-center gap-3 lg:hidden">
-            <div className="grid size-10 place-items-center rounded-xl bg-[#102a33] text-teal-300">
-              <Activity className="size-6" aria-hidden />
-            </div>
-            <p className="text-xl font-black text-slate-900">Patienty</p>
+            <p className="text-2xl font-black text-slate-900">Patienty</p>
           </div>
           <div className="card p-6 sm:p-9">
             <span className="badge border-amber-200 bg-amber-50 text-amber-800">
