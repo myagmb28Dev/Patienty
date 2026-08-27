@@ -1,0 +1,1 @@
+package dev.patienty.assistant;import dev.patienty.patient.PatientDtos.*;import java.util.List;public interface AiAnswerGenerator{GeneratedAnswer generate(String question,AssistantIntent intent,AssistantContext context,PatientSummary summary);record GeneratedAnswer(String answer,List<Observation> observations){}}
