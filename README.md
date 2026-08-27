@@ -1,132 +1,65 @@
-# Patienty
+# Patienty (페이션티)
 
-Patienty is an AI-assisted patient management system that helps medical professionals understand patient history and changes quickly.
+Patienty는 바쁜 의료진이 환자의 진료 기록과 최근 변화를 신속하고 정확하게 파악할 수 있도록 돕는 **AI 기반 환자 맥락 파악 코파일럿(Patient Context Copilot)** 서비스입니다.
 
-## Repository structure
+---
 
-```text
-Patienty/
-├── backend/     # Spring Boot API
-├── frontend/    # Next.js web application
-└── docs/        # Product and architecture documentation
-```
+## 1. 프로젝트 개요
 
-## Local development
+의료 현장에서는 제한된 진료 시간 동안 환자의 과거 병력, 검사 결과, 복약 변화 등 방대한 진료 기록을 빠르게 검토해야 하는 어려움이 있습니다.
 
-Requirements: Java 17, Node.js 24, npm, and Docker.
+Patienty는 의료진이 환자의 차트를 열었을 때 **10초 이내에 환자의 핵심 맥락을 파악**할 수 있도록 진료 기록을 구조화하고, 시계열 추세와 주요 변화를 분석하여 요약해 주는 지능형 진료 보조 도구입니다.
 
-Create the untracked local environment file and start PostgreSQL:
+---
 
-```powershell
-Copy-Item .env.example .env.local
-docker compose --env-file .env.local up -d postgres
-```
+## 2. 핵심 목표: 10초의 법칙
 
-Run the backend and frontend in separate terminals:
+Patienty는 의료진이 환자 상세 페이지에 진입한 후 10초 안에 다음 네 가지 핵심 정보를 즉각 파악하는 것을 목표로 합니다.
 
-```powershell
-Set-Location backend
-.\gradlew.bat bootRun
-```
+1. **환자 기본 정보**: 환자가 누구인지, 기본적인 인적 사항 및 진료과 정보
+2. **최근 변화 내역**: 이전 진료 이후 어떤 변화(검사 수치 추이, 처방 약물 변경 등)가 발생했는지
+3. **집중 검토 항목**: 이상 징후나 주의 깊게 확인해야 할 핵심 지표가 무엇인지
+4. **근거 진료 기록**: 요약과 설명의 바탕이 되는 원천 진료 기록이 무엇인지
 
-```powershell
-Set-Location frontend
-npm ci
-npm run dev
-```
+---
 
-The backend's default `local` profile imports the repository-root `.env.local`.
-The frontend reads only `NEXT_PUBLIC_API_BASE_URL` from that same file; database
-credentials are never injected into the Next.js process. If port 5432 is already
-in use, change both `POSTGRES_PORT` and the datasource URL in `.env.local`.
+## 3. 핵심 설계 원칙 및 신뢰성
 
-The local app is available at `http://localhost:3000`, and the API runs at
-`http://localhost:8080`. Stop the database with:
+- **진료 보조 및 맥락 설명 중심**: Patienty는 질병을 직접 진단하거나 치료법을 처방하지 않습니다. 실제 기록된 진료 데이터를 명확하게 정리하고 설명하여 의료진의 의사결정을 지원합니다.
+- **모든 설명의 근거(Evidence) 추적성 보장**: AI가 제시하는 모든 요약 및 분석 내용은 근거가 되는 검사 결과, 진료 기록, 처방전 데이터와 1:1로 연결됩니다.
+- **할루시네이션(환각) 방지**: 임의로 추론하거나 확인되지 않은 정보를 생성하지 않으며, 데이터가 부족한 경우 솔직하게 근거 부족 상태를 안내합니다.
+- **철저한 접근 권한 및 보안**: 의료진 본인이 담당하는 환자의 데이터만 안전하게 조회 및 분석할 수 있도록 격리된 권한 체계를 갖추고 있습니다.
 
-```powershell
-docker compose --env-file .env.local down
-```
+---
 
-### Demo clinicians
+## 4. 주요 기능 및 서비스 구성
 
-The `local` and opt-in `demo` profiles seed two synthetic clinician accounts
-with different patient assignments:
+### 1) 통합 대시보드
+- 오늘 예정된 진료 예약 일정 및 시간대별 예약 현황 확인
+- 최근 검사 수치 변화나 처방 변경으로 인해 사전 검토가 필요한 환자 목록 즉시 안내
+- 최근 조회한 환자 바로가기 지원
 
-| Account | Password |
-| --- | --- |
-| `doctor.kim@patienty.local` | `PatientyDemo1!` |
-| `doctor.lee@patienty.local` | `PatientyDemo2!` |
+### 2) 환자 검색 및 관리
+- 환자명, 환자 등록번호를 통한 신속한 환자 검색
+- 진료과목 및 진료 상태 필터를 통한 환자 목록 탐색
+- 환자별 최근 진료일 및 주의 필요 여부 인디케이터 제공
 
-These are public demo credentials, not production secrets. Use `prod,demo` for
-the deployed synthetic demo; `prod` alone creates only the schema. Authentication
-uses an HTTP-only server session and CSRF token flow. Local cookies use
-`Secure=false` and `SameSite=Lax`; production defaults to `Secure=true` and
-`SameSite=None`.
+### 3) 10초 환자 요약 뷰 (환자 상세)
+- **핵심 요약 카드**: 최근 진료 이후 발생한 주요 변화와 주의 검토 항목을 최대 3개까지 명확히 요약
+- **측정치 추세 차트**: 혈압, 혈당 등 주요 생체 징후 및 검사 수치의 시계열 변화를 직관적인 그래프로 시각화
+- **통합 진료 타임라인**: 과거 진료 기록, 검사 시행 내역, 처방 변경 이력을 시간 순서대로 통합 제공
+- **복약 및 처방 관리**: 현재 복용 중인 처방약 목록과 이전 처방 대비 추가, 중단, 용량 변경 내역을 명확하게 비교
 
-## Environment files
+### 4) 근거 기반 AI 어시스턴트
+- 환자의 진료 기록에 대한 자연어 질의응답 지원 (예: "지난 진료 이후 주요 변화는 무엇인가요?", "최근 혈압 추이를 알려줘")
+- 답변과 함께 실제 근거 진료 기록(검사 결과, 진료 기록 등)을 연결 태그 형태로 제공
+- 근거 태그 클릭 시 해당 원천 기록 위치로 자동 스크롤 및 하이라이트 표시
 
-Only [.env.example](.env.example) is committed.
+---
 
-- `.env.local` is read by Docker Compose, Spring's `local` profile, and the
-  frontend development process.
-- `.env` is read by Spring's already-active `prod` profile and the frontend
-  production process. On managed hosting, store the same values as platform
-  secrets instead.
-- Both real files are ignored by Git. Never store credentials in the repository.
+## 5. 서비스 아키텍처 개요
 
-Activate `prod` or `prod,demo` with a command-line argument or hosting setting,
-not from inside `.env`. Host-provided environment variables take precedence over
-the files. The frontend allowlists only `NEXT_PUBLIC_API_BASE_URL`; Neon
-credentials are never loaded into the Next.js process.
+- **Web Frontend (Next.js)**: 의료진이 진료 중 직관적으로 정보를 탐색하고 차트를 확인할 수 있는 반응형 웹 애플리케이션
+- **Backend API (Spring Boot)**: 데이터 정규화, 시계열 추세 계산, AI 맥락 빌더 및 안전한 권한 검증을 수행하는 비즈니스 엔진
+- **Database (PostgreSQL)**: 환자 정보, 진료 기록, 검사 수치, 처방전 데이터를 구조화하여 관리하는 관계형 데이터베이스
 
-## Neon deployment database
-
-The configured Neon project has separate `development` and `main` branches.
-Apply and verify Flyway migrations on `development` first. Only point the
-deployment at `main` after that verification succeeds.
-
-1. Put the Neon JDBC URL, role, and password in the ignored root `.env` as
-   `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, and
-   `SPRING_DATASOURCE_PASSWORD`. Keep `sslmode=require`.
-2. Replace the `.invalid` frontend and backend origins in `.env`.
-3. Build the backend, then activate the deployment profiles explicitly:
-
-```powershell
-Set-Location backend
-.\gradlew.bat build
-java -jar build/libs/patienty-backend-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod,demo
-```
-
-Use `prod,demo` for this synthetic public demo so both clinicians can log in.
-Use `prod` alone only when an external clinician-provisioning path exists. On a
-managed backend host, set `SPRING_PROFILES_ACTIVE=prod,demo` in the platform
-settings instead of relying on the file. Production configuration fails fast when
-the database or allowed frontend origin is missing.
-
-The frontend production build reads only the public API URL from root `.env`;
-hosting environment values override that file.
-
-Do not expose the Neon connection string to Next.js or any `NEXT_PUBLIC_*`
-variable. See Neon's official [connection guide](https://neon.com/docs/connect/connect-from-any-app)
-and [secure connection guide](https://neon.com/docs/connect/connect-securely).
-
-## Checks
-
-```powershell
-Set-Location backend
-.\gradlew.bat test
-.\gradlew.bat build
-```
-
-```powershell
-Set-Location frontend
-npm ci
-npm run lint
-npm run type-check
-npm test
-npm run build
-```
-
-## Documentation
-
-- [Initial architecture and MVP design](docs/architecture.md)
