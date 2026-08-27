@@ -40,6 +40,14 @@ const authHeader = {
   "Authorization": `Bearer ${apiKey}`,
 };
 
+const LOCAL_ONLY_KEYS = new Set([
+  "RENDER_API_KEY",
+  "POSTGRES_DB",
+  "POSTGRES_USER",
+  "POSTGRES_PASSWORD",
+  "POSTGRES_PORT",
+]);
+
 async function getServices() {
   const res = await fetch("https://api.render.com/v1/services?limit=50", {
     headers: authHeader,
@@ -95,7 +103,11 @@ async function run() {
     const frontendVars = {};
 
     for (const [key, value] of Object.entries(envConfig)) {
-      if (key === "RENDER_API_KEY") continue;
+      if (LOCAL_ONLY_KEYS.has(key)) continue;
+
+      if (key === "SPRING_DATASOURCE_URL" && (value.includes("localhost") || value.includes("127.0.0.1"))) {
+        continue;
+      }
 
       if (key.startsWith("NEXT_PUBLIC_")) {
         frontendVars[key] = value;
