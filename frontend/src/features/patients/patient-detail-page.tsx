@@ -62,7 +62,7 @@ export function PatientDetailPage() {
       setError(
         detailResult.reason instanceof Error
           ? detailResult.reason.message
-          : "환자 기록을 불러오지 못했어.",
+          : "환자 기록을 불러오지 못했습니다.",
       );
       setLoading(false);
       return;
@@ -100,7 +100,7 @@ export function PatientDetailPage() {
     setEvidenceNotice(
       found
         ? ""
-        : "이 근거는 현재 불러온 기록 범위에 없어. 타임라인의 전체 기간을 조회하면 확인할 수 있어.",
+        : "이 근거는 현재 불러온 기록 범위에 없습니다. 타임라인의 전체 기간을 조회하면 확인하실 수 있습니다.",
     );
   }, []);
 
@@ -113,9 +113,9 @@ export function PatientDetailPage() {
   if (error || !detail) {
     return (
       <ErrorState
-        message={error || "사용 가능한 환자 기록이 없어."}
+        message={error || "사용 가능한 환자 기록이 없습니다."}
         onRetry={() => void load()}
-        title="환자 상세를 열지 못했어"
+        title="환자 상세를 열지 못했습니다"
       />
     );
   }
@@ -137,21 +137,20 @@ export function PatientDetailPage() {
         </Link>
         <div className="mt-4 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
           <div className="flex items-center gap-4">
-            <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-[#102a33] text-xl font-black text-white">
+            <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-slate-900 text-xl font-bold text-white shadow-xs">
               {detail.header.name.slice(0, 1)}
             </div>
             <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-3xl font-black tracking-tight text-slate-950">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
                   {detail.header.name}
                 </h1>
-                <span className="badge border-amber-200 bg-amber-50 text-amber-800">
-                  합성 환자
+                <span className="badge border-slate-200 bg-slate-100 text-xs font-semibold text-slate-700">
+                  {detail.header.patientNumber}
                 </span>
               </div>
-              <p className="mt-1 text-sm font-semibold text-slate-500">
-                {detail.header.age}세 · {formatSex(detail.header.sexCode)} ·{" "}
-                {detail.header.patientNumber}
+              <p className="mt-1 text-sm font-medium text-slate-500">
+                {detail.header.age}세 · {formatSex(detail.header.sexCode)} · {detail.header.departmentName || "내과"}
               </p>
             </div>
           </div>
@@ -172,18 +171,18 @@ export function PatientDetailPage() {
         <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
           <AlertCircle className="mt-0.5 size-5 shrink-0" aria-hidden />
           <div>
-            <p className="font-black">일부 기록을 표시하지 못했어</p>
+            <p className="font-black">일부 기록을 표시하지 못했습니다</p>
             <p className="mt-1 text-xs leading-5">
               누락 범주: {Array.from(new Set(missingCategories)).join(", ")}.
-              보이는 기록만으로 요약했어.
+              조회된 기록만으로 요약했습니다.
             </p>
           </div>
         </div>
       )}
 
       {evidenceNotice && (
-        <div className="flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700" role="status">
-          <ExternalLink className="size-4 text-teal-700" aria-hidden />
+        <div className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-2xs" role="status">
+          <ExternalLink className="size-4 text-slate-700" aria-hidden />
           {evidenceNotice}
         </div>
       )}
@@ -195,7 +194,7 @@ export function PatientDetailPage() {
           <section className="card p-5 sm:p-6">
             <SectionHeading
               icon={HeartPulse}
-              subtitle="같은 단위의 수치만 비교해 표시해."
+              subtitle="동일한 단위의 수치만 비교하여 표시합니다."
               title="검사 결과 변화"
             />
             <div className="mt-5">
@@ -210,7 +209,7 @@ export function PatientDetailPage() {
           <section className="card p-5 sm:p-6">
             <SectionHeading
               icon={ClipboardList}
-              subtitle="진료·검사·처방 기록을 시간순으로 모았어."
+              subtitle="진료·검사·처방 기록을 시간순으로 정리했습니다."
               title="최근 타임라인"
             />
             <div className="mt-5">
@@ -221,7 +220,7 @@ export function PatientDetailPage() {
           <section className="card p-5 sm:p-6">
             <SectionHeading
               icon={Pill}
-              subtitle="처방 기록이며, 실제 복용 여부를 의미하지 않아."
+              subtitle="처방 기록이며, 실제 복용 여부를 의미하지 않습니다."
               title="현재 처방"
             />
             <div className="mt-5">
@@ -268,9 +267,9 @@ function PatientDetailSkeleton() {
 
 function HeaderFact({ label, value }: { label: string; value: string }) {
   return (
-    <div className="min-w-36 rounded-xl border border-slate-200 bg-white px-4 py-3">
-      <p className="text-xs font-semibold text-slate-400">{label}</p>
-      <p className="mt-1 text-sm font-black text-slate-800">{value}</p>
+    <div className="min-w-36 rounded-xl border border-slate-200/80 bg-slate-50/60 px-4 py-3">
+      <p className="text-xs font-semibold text-slate-500">{label}</p>
+      <p className="mt-1 text-sm font-bold text-slate-900">{value}</p>
     </div>
   );
 }
@@ -285,13 +284,13 @@ function SectionHeading({
   subtitle: string;
 }) {
   return (
-    <div className="flex items-start gap-3">
-      <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-teal-50 text-teal-700">
-        <Icon className="size-5" aria-hidden />
+    <div className="flex items-start gap-3.5">
+      <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-700 border border-slate-200/60">
+        <Icon className="size-4.5" aria-hidden />
       </div>
       <div>
         <h2 className="section-title">{title}</h2>
-        <p className="mt-1 text-xs text-slate-500">{subtitle}</p>
+        <p className="mt-0.5 text-xs text-slate-500">{subtitle}</p>
       </div>
     </div>
   );
@@ -308,48 +307,62 @@ function SummaryCard({
 
   return (
     <section className="card overflow-hidden">
-      <div className="border-b border-teal-100 bg-gradient-to-r from-teal-50 to-cyan-50 p-5 sm:p-6">
-        <div className="flex items-center gap-2 text-sm font-black text-teal-800">
-          <Activity className="size-5" aria-hidden />
-          10초 환자 요약
+      <div className="border-b border-slate-200/80 bg-white p-5 sm:p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5 text-sm font-bold text-slate-900">
+            <div className="grid size-8 place-items-center rounded-lg bg-slate-100 text-slate-700">
+              <Activity className="size-4.5" aria-hidden />
+            </div>
+            임상 경과 요약
+          </div>
+          <span className="badge border-slate-200 bg-slate-100 text-xs font-semibold text-slate-700">
+            AI 분석 요약
+          </span>
         </div>
-        <p className="mt-4 text-lg font-bold leading-8 text-slate-900">
-          {detail.summary.text || "사용 가능한 요약 기록이 없어."}
-        </p>
+        <div className="mt-4 rounded-xl border border-slate-200/70 bg-slate-50/70 p-4">
+          <p className="text-sm font-semibold leading-relaxed text-slate-800">
+            {detail.summary.text || "사용 가능한 요약 기록이 없습니다."}
+          </p>
+        </div>
       </div>
-      <div className="p-5 sm:p-6">
-        <h3 className="text-sm font-black text-slate-900">주의해서 볼 변화</h3>
+      <div className="p-5 sm:p-6 bg-slate-50/30">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-bold text-slate-900">주요 관찰 및 임상적 변화</h3>
+          <span className="badge border-amber-200 bg-amber-50 text-[11px] font-semibold text-amber-800">
+            AI 이상 변화 감지
+          </span>
+        </div>
         {observations.length === 0 ? (
-          <div className="mt-3 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800">
-            <CheckCircle2 className="size-5" aria-hidden />
-            기록은 있지만 주목할 만한 변화가 감지되지 않았어.
+          <div className="mt-3 flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 text-sm font-medium text-slate-600">
+            <CheckCircle2 className="size-4.5 text-slate-400" aria-hidden />
+            기록은 있지만 주목할 만한 특이 변화가 감지되지 않았습니다.
           </div>
         ) : (
-          <div className="mt-3 grid gap-3 lg:grid-cols-2">
+          <div className="mt-3.5 grid gap-3 lg:grid-cols-2">
             {observations.slice(0, 3).map((observation, index) => (
               <article
-                className="rounded-xl border border-amber-200 bg-amber-50/70 p-4"
+                className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs transition hover:border-slate-300"
                 key={observation.type + "-" + index}
               >
                 <div className="flex gap-3">
-                  <AlertCircle className="mt-0.5 size-5 shrink-0 text-amber-700" aria-hidden />
-                  <p className="text-sm font-bold leading-6 text-slate-800">
+                  <AlertCircle className="mt-0.5 size-4.5 shrink-0 text-slate-600" aria-hidden />
+                  <p className="text-sm font-semibold leading-6 text-slate-800">
                     {observation.text}
                   </p>
                 </div>
-                <div className="mt-3 flex flex-wrap gap-1.5">
+                <div className="mt-3 flex flex-wrap gap-1.5 pt-2 border-t border-slate-100">
                   {observation.evidenceIds.map((evidenceId) => {
                     const evidence = detail.summary.evidence.find(
                       (item) => item.id === evidenceId,
                     );
                     return (
                       <button
-                        className="inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-white/80 px-2 py-1 text-[11px] font-bold text-amber-900 hover:border-teal-400"
+                        className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-medium text-slate-700 transition hover:bg-slate-100 hover:border-slate-300"
                         key={evidenceId}
                         onClick={() => onEvidence(evidenceId)}
                         type="button"
                       >
-                        <ExternalLink className="size-3" aria-hidden />
+                        <ExternalLink className="size-3 text-slate-400" aria-hidden />
                         {evidence?.label ?? "근거 기록"}
                       </button>
                     );
@@ -368,14 +381,14 @@ function Timeline({ items }: { items: TimelineItem[] }) {
   if (items.length === 0) {
     return (
       <EmptyState
-        message="표시할 진료·검사·처방 기록이 없어."
+        message="표시할 진료·검사·처방 기록이 없습니다."
         title="사용 가능한 기록 없음"
       />
     );
   }
 
   return (
-    <ol className="relative space-y-1 before:absolute before:bottom-5 before:left-[17px] before:top-5 before:w-px before:bg-slate-200">
+    <ol className="relative space-y-2 before:absolute before:bottom-5 before:left-[17px] before:top-5 before:w-px before:bg-slate-200">
       {items.map((item) => {
         const Icon =
           item.type === "EXAMINATION"
@@ -385,22 +398,22 @@ function Timeline({ items }: { items: TimelineItem[] }) {
               : FileText;
         return (
           <li
-            className="relative flex gap-4 rounded-xl border border-transparent p-3 transition"
+            className="relative flex gap-4 rounded-xl border border-transparent p-2.5 transition hover:bg-slate-50/80"
             data-evidence-target="true"
             id={evidenceTargetId(item.evidenceId)}
             key={item.evidenceId}
           >
-            <div className="z-10 grid size-9 shrink-0 place-items-center rounded-full border border-slate-200 bg-white text-teal-700">
+            <div className="z-10 grid size-9 shrink-0 place-items-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-xs">
               <Icon className="size-4" aria-hidden />
             </div>
             <div className="min-w-0 flex-1 pt-0.5">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="font-bold text-slate-900">{item.title}</p>
-                <time className="text-xs font-semibold text-slate-400">
+                <p className="text-sm font-bold text-slate-900">{item.title}</p>
+                <time className="text-xs font-medium text-slate-400">
                   {formatDateTime(item.occurredAt)}
                 </time>
               </div>
-              <p className="mt-1 text-sm leading-6 text-slate-600">
+              <p className="mt-0.5 text-sm leading-6 text-slate-600">
                 {item.description || "세부 기록 없음"}
               </p>
             </div>
@@ -428,7 +441,7 @@ function Prescriptions({ items }: { items: PrescriptionView[] }) {
   if (items.length === 0) {
     return (
       <EmptyState
-        message="현재 활성 상태인 처방 기록이 없어."
+        message="현재 활성 상태인 처방 기록이 없습니다."
         title="사용 가능한 처방 기록 없음"
       />
     );
@@ -438,15 +451,20 @@ function Prescriptions({ items }: { items: PrescriptionView[] }) {
     <div className="divide-y divide-slate-100">
       {items.map((item, index) => (
         <div
-          className="flex items-start gap-4 py-4 first:pt-0 last:pb-0"
+          className="flex items-start gap-4 py-3.5 first:pt-0 last:pb-0"
           data-evidence-ids={item.evidenceId}
           key={item.id || index}
         >
-          <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-sky-50 text-sky-700">
-            <Pill className="size-5" aria-hidden />
+          <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-slate-100 text-slate-700 border border-slate-200/60">
+            <Pill className="size-4.5" aria-hidden />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-bold text-slate-900">{item.medicationName}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-bold text-slate-900">{item.medicationName}</p>
+              <span className="badge border-slate-200 bg-slate-50 text-[11px] font-medium text-slate-600">
+                유지 처방
+              </span>
+            </div>
             <p className="mt-1 text-sm text-slate-600">
               {item.doseValue != null
                 ? String(item.doseValue) + (item.doseUnit ?? "")
@@ -471,3 +489,4 @@ function Prescriptions({ items }: { items: PrescriptionView[] }) {
     </div>
   );
 }
+

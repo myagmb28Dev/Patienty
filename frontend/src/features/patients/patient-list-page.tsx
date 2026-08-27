@@ -88,7 +88,7 @@ export function PatientListPage() {
         }),
       );
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "환자 목록을 불러오지 못했어.");
+      setError(caught instanceof Error ? caught.message : "환자 목록을 불러오지 못했습니다.");
     } finally {
       setLoading(false);
     }
@@ -118,7 +118,7 @@ export function PatientListPage() {
           환자 찾기
         </h1>
         <p className="mt-2 text-sm text-slate-600">
-          이름이나 환자번호로 찾고, 최근 기록과 변화 표시를 바로 확인해.
+          이름이나 환자번호로 검색하여 최근 진료 기록과 상태 변화를 확인하세요.
         </p>
       </section>
 
@@ -198,12 +198,12 @@ export function PatientListPage() {
               actionLabel={hasFilters ? "필터 초기화" : undefined}
               message={
                 hasFilters
-                  ? "검색어나 필터를 조금 바꿔봐."
-                  : "현재 배정된 환자 기록이 없어."
+                  ? "검색어나 필터 조건을 변경해 보세요."
+                  : "현재 배정된 환자 기록이 없습니다."
               }
               onAction={hasFilters ? clearFilters : undefined}
               search
-              title={hasFilters ? "검색 결과가 없어" : "환자 기록 없음"}
+              title={hasFilters ? "검색 결과가 없습니다" : "환자 기록 없음"}
             />
           </div>
         ) : (
@@ -248,7 +248,7 @@ function PatientRow({ patient }: { patient: PatientListItem }) {
   return (
     <tr className="group transition hover:bg-teal-50/35">
       <td className="px-5 py-4">
-        <Link className="flex items-center gap-3" href={`/patients/${patient.id}`}>
+        <Link className="flex items-center gap-3" href={`/patients/${patient.patientNumber || patient.id}`}>
           <div className="grid size-10 shrink-0 place-items-center rounded-full bg-slate-100 text-sm font-black text-slate-700 group-hover:bg-teal-100 group-hover:text-teal-800">
             {patient.name.slice(0, 1)}
           </div>
@@ -274,7 +274,7 @@ function PatientRow({ patient }: { patient: PatientListItem }) {
         <Link
           aria-label={`${patient.name} 상세 열기`}
           className="grid size-9 place-items-center rounded-lg text-slate-400 hover:bg-teal-100 hover:text-teal-800"
-          href={`/patients/${patient.id}`}
+          href={`/patients/${patient.patientNumber || patient.id}`}
         >
           <ArrowRight className="size-4" />
         </Link>
@@ -285,7 +285,7 @@ function PatientRow({ patient }: { patient: PatientListItem }) {
 
 function PatientCard({ patient }: { patient: PatientListItem }) {
   return (
-    <Link className="block p-4 hover:bg-teal-50/35" href={`/patients/${patient.id}`}>
+    <Link className="block p-4 hover:bg-teal-50/35" href={`/patients/${patient.patientNumber || patient.id}`}>
       <div className="flex items-start gap-3">
         <div className="grid size-10 place-items-center rounded-full bg-slate-100">
           <UserRound className="size-5 text-slate-600" aria-hidden />

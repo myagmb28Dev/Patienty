@@ -14,12 +14,12 @@ describe("AI assistant", () => {
   beforeEach(() => {
     vi.mocked(patientsApi.ask).mockResolvedValue({
       status: "ANSWERED",
-      answer: "최근 혈압 수치가 상승했어.",
+      answer: "최근 혈압 수치가 상승했습니다.",
       observations: [
         {
           type: "MEASUREMENT_TREND",
           level: "ATTENTION",
-          text: "수축기 혈압이 상승했어.",
+          text: "수축기 혈압이 상승했습니다.",
           evidenceIds: ["examination-result:1"],
         },
       ],
@@ -42,7 +42,7 @@ describe("AI assistant", () => {
 
     await user.click(
       screen.getByRole("button", {
-        name: "지난 진료 이후 변경된 사항은?",
+        name: /지난 진료 이후 변경/,
       }),
     );
 
@@ -52,7 +52,7 @@ describe("AI assistant", () => {
         "지난 진료 이후 변경된 사항은?",
       ),
     );
-    expect(await screen.findByText("최근 혈압 수치가 상승했어.")).toBeVisible();
+    expect(await screen.findByText("최근 혈압 수치가 상승했습니다.")).toBeVisible();
 
     const evidenceButtons = screen.getAllByRole("button", {
       name: /8월 20일 혈압 검사/,

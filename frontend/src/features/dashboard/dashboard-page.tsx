@@ -31,7 +31,7 @@ export function DashboardPage() {
     try {
       setData(await dashboardApi.get());
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "대시보드를 불러오지 못했어.");
+      setError(caught instanceof Error ? caught.message : "대시보드를 불러오지 못했습니다.");
     } finally {
       setLoading(false);
     }
@@ -54,10 +54,10 @@ export function DashboardPage() {
         <div>
           <p className="text-sm font-bold text-teal-700">오늘의 진료 흐름</p>
           <h1 className="mt-1 text-3xl font-black tracking-tight text-slate-950">
-            {clinician?.name ?? "의료진"}님, 어디부터 볼까?
+            {clinician?.name ?? "의료진"}님, 환자 현황을 확인하세요
           </h1>
           <p className="mt-2 text-sm text-slate-600">
-            담당 환자의 예약과 최근 변화를 빠르게 확인할 수 있어.
+            담당 환자의 예약과 최근 변화를 빠르게 확인할 수 있습니다.
           </p>
         </div>
         <Link className="button-primary" href="/patients">
@@ -107,7 +107,7 @@ export function DashboardPage() {
                 <div>
                   <h2 className="section-title">오늘 예약</h2>
                   <p className="mt-1 text-sm text-slate-500">
-                    시간순으로 정리한 담당 환자 예약이야.
+                    시간순으로 정리한 담당 환자의 진료 예약입니다.
                   </p>
                 </div>
                 <Clock3 className="size-5 text-slate-400" aria-hidden />
@@ -116,7 +116,7 @@ export function DashboardPage() {
                 <SectionSkeleton rows={4} />
               ) : appointments.length === 0 ? (
                 <EmptyState
-                  message="오늘 예정된 담당 환자 예약이 없어."
+                  message="오늘 예정된 담당 환자 예약이 없습니다."
                   title="예약 기록 없음"
                 />
               ) : (
@@ -124,7 +124,7 @@ export function DashboardPage() {
                   {appointments.map((appointment) => (
                     <Link
                       className="group flex items-center gap-4 py-4 first:pt-0 last:pb-0"
-                      href={`/patients/${appointment.patientId}`}
+                      href={`/patients/${appointment.patientNumber || appointment.patientId}`}
                       key={appointment.appointmentId}
                     >
                       <div className="min-w-20 rounded-xl bg-slate-100 px-3 py-2 text-center text-sm font-black text-slate-700">
@@ -149,28 +149,33 @@ export function DashboardPage() {
             </section>
 
             <section className="card p-5 sm:p-6">
-              <div className="mb-5">
-                <h2 className="section-title">변화 검토 필요</h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  진단이 아닌, 기록상 변화가 감지된 담당 환자야.
-                </p>
+              <div className="mb-5 flex items-center justify-between">
+                <div>
+                  <h2 className="section-title">변화 검토 필요</h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    진단이 아닌, 기록상 변화가 감지된 담당 환자입니다.
+                  </p>
+                </div>
+                <span className="badge border-slate-200 bg-slate-100 text-xs font-semibold text-slate-700">
+                  AI 변화 감지
+                </span>
               </div>
               {loading ? (
                 <SectionSkeleton rows={4} />
               ) : attentionPatients.length === 0 ? (
                 <EmptyState
-                  message="현재 검토가 필요한 변화가 감지되지 않았어."
+                  message="현재 검토가 필요한 변화가 감지되지 않았습니다."
                   title="특이 변화 없음"
                 />
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {attentionPatients.map((patient) => (
                     <Link
-                      className="group flex items-center gap-3 rounded-xl border border-slate-200 p-3 transition hover:border-teal-300 hover:bg-teal-50/40"
-                      href={`/patients/${patient.id}`}
+                      className="group flex items-center gap-3 rounded-xl border border-slate-200/90 p-3 transition hover:border-slate-300 hover:bg-slate-50 shadow-2xs"
+                      href={`/patients/${patient.patientNumber || patient.id}`}
                       key={patient.id}
                     >
-                      <div className="grid size-10 shrink-0 place-items-center rounded-full bg-slate-100 text-sm font-black text-slate-700">
+                      <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-slate-800 text-xs font-bold text-white">
                         {patient.name.slice(0, 1)}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -194,24 +199,24 @@ export function DashboardPage() {
               <div>
                 <h2 className="section-title">최근 확인한 환자</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  이 브라우저에서 최근 열어본 가상 환자야.
+                  최근 조회한 환자 바로가기 목록입니다.
                 </p>
               </div>
-              <Link className="text-sm font-bold text-teal-700 hover:text-teal-900" href="/patients">
+              <Link className="text-sm font-semibold text-slate-600 hover:text-slate-900" href="/patients">
                 전체 환자 보기
               </Link>
             </div>
             {recent.length === 0 ? (
               <EmptyState
-                message="환자 상세를 열면 여기에 바로가기 기록이 생겨."
+                message="환자 상세를 조회하면 여기에 바로가기 기록이 표시됩니다."
                 title="최근 확인 기록 없음"
               />
             ) : (
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {recent.map((patient) => (
                   <Link
-                    className="rounded-xl border border-slate-200 p-4 transition hover:border-teal-300 hover:bg-teal-50/40"
-                    href={`/patients/${patient.id}`}
+                    className="rounded-xl border border-slate-200/90 p-4 transition hover:border-slate-300 hover:bg-slate-50 shadow-2xs"
+                    href={`/patients/${patient.patientNumber || patient.id}`}
                     key={patient.id}
                   >
                     <p className="font-bold text-slate-900">{patient.name}</p>
@@ -234,32 +239,24 @@ function MetricCard({
   label,
   value,
   loading,
-  tone,
 }: {
   icon: typeof CalendarClock;
   label: string;
   value: number;
   loading: boolean;
-  tone: "teal" | "amber" | "blue" | "slate";
+  tone?: "teal" | "amber" | "blue" | "slate";
 }) {
-  const tones = {
-    teal: "bg-teal-50 text-teal-700",
-    amber: "bg-amber-50 text-amber-700",
-    blue: "bg-sky-50 text-sky-700",
-    slate: "bg-slate-100 text-slate-700",
-  };
-
   return (
     <div className="card flex items-center gap-4 p-5">
-      <div className={`grid size-12 place-items-center rounded-2xl ${tones[tone]}`}>
-        <Icon className="size-6" aria-hidden />
+      <div className="grid size-11 place-items-center rounded-xl bg-slate-100 text-slate-700 border border-slate-200/60">
+        <Icon className="size-5" aria-hidden />
       </div>
       <div>
-        <p className="text-sm font-semibold text-slate-500">{label}</p>
+        <p className="text-xs font-semibold text-slate-500">{label}</p>
         {loading ? (
           <div className="mt-2 h-7 w-12 animate-pulse rounded bg-slate-100" />
         ) : (
-          <p className="mt-1 text-2xl font-black text-slate-950">{value}</p>
+          <p className="mt-0.5 text-2xl font-bold tracking-tight text-slate-900">{value}</p>
         )}
       </div>
     </div>

@@ -62,8 +62,8 @@ async function readError(response: Response): Promise<ApiError> {
     details?.message ||
     details?.title ||
     (response.status === 401
-      ? "로그인이 필요해."
-      : "요청을 처리하지 못했어. 잠시 후 다시 시도해줘.");
+      ? "로그인이 필요합니다."
+      : "요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.");
 
   return new ApiError(message, response.status, details);
 }

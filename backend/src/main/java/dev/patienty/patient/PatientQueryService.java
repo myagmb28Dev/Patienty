@@ -34,24 +34,30 @@ public class PatientQueryService {
         return PageResponse.from(result,result.getContent().stream().map(this::row).toList());
     }
 
-    public PatientDetail detail(UUID patientId){
-        Patient p=requireAssigned(patientId); Optional<Encounter> encounter=latestEncounter(patientId); Optional<Appointment> next=nextAppointment(patientId);
+    public PatientDetail detail(String identifier){
+        Patient p=requireAssigned(identifier); UUID patientId=p.getId(); Optional<Encounter> encounter=latestEncounter(patientId); Optional<Appointment> next=nextAppointment(patientId);
         String code=encounter.map(Encounter::getDepartmentCode).or(()->next.map(Appointment::getDepartmentCode)).orElse(null);
         PatientHeader header=new PatientHeader(p.getId(),p.getPatientNumber(),p.getName(),p.getBirthDate(),age(p.getBirthDate()),p.getSexCode(),code,departmentName(code),encounter.map(Encounter::getOccurredAt).orElse(null),true);
         return new PatientDetail(header,next.map(this::appointment).orElse(null),currentPrescriptions(patientId),insights.summary(patientId));
     }
+    public PatientDetail detail(UUID patientId){return detail(patientId.toString());}
 
-    public List<TimelineItem> timeline(UUID patientId){
-        requireAssigned(patientId); List<TimelineItem> items=new ArrayList<>();
+    public List<TimelineItem> timeline(String identifier){
+        Patient p=requireAssigned(identifier); UUID patientId=p.getId(); List<TimelineItem> items=new ArrayList<>();
         for(Encounter e:encounters.findTop20ByPatientIdAndStatusOrderByOccurredAtDesc(patientId,"COMPLETED")) items.add(new TimelineItem("encounter:"+e.getId(),"ENCOUNTER",e.getOccurredAt(),departmentName(e.getDepartmentCode())+" 진료",valueOr(e.getChiefComplaint(),"진료 기록")));
         Instant after=clock.instant().minus(365,ChronoUnit.DAYS);
         Map<UUID,List<MeasurementRecord>> byExam=new LinkedHashMap<>(); for(MeasurementRecord r:examinations.findMeasurements(patientId,"",after,clock.instant()))byExam.computeIfAbsent(r.examinationId(),ignored->new ArrayList<>()).add(r);
         for(List<MeasurementRecord> records:byExam.values()){String description=records.stream().map(r->(r.displayName()+" "+r.value().stripTrailingZeros().toPlainString()+" "+Objects.toString(r.unit(),"")).trim()).collect(java.util.stream.Collectors.joining(", "));items.add(new TimelineItem(records.get(0).evidenceId(),"EXAMINATION",records.get(0).occurredAt(),"검사 결과",description));}
-        for(List<PrescriptionRecord> records:group(prescriptions.findRecent(patientId,after)).values()){String description=records.stream().map(r->r.medicationName()+" "+r.doseValue().stripTrailingZeros().toPlainString()+r.doseUnit()).collect(java.util.stream.Collectors.joining(", "));items.add(new TimelineItem(records.get(0).evidenceId(),"PRESCRIPTION",records.get(0).prescribedAt(),"처방 "+records.get(0).status(),description));}
+        for(List<PrescriptionRecord> records:group(prescriptions.findRecent(patientId,after)).values()){String description=records.stream().map(r->r.medicationName()+" "+r.doseValue().stripTrailingZeros().toPlainString()+r.doseUnit()).collect(java.util.stream.Collectors.joining(", "));items.add(new TimelineItem(records.get(0).evidenceId(),"PRESCRIPTION",records.get(0).prescribedAt(),formatPrescriptionTitle(records.get(0).status()),description));}
         return items.stream().sorted(Comparator.comparing(TimelineItem::occurredAt).reversed()).limit(50).toList();
     }
+    public List<TimelineItem> timeline(UUID patientId){return timeline(patientId.toString());}
 
-    public List<MeasurementSeries> measurements(UUID id,String metric,Instant from,Instant to){requireAssigned(id);Instant end=to==null?clock.instant():to;return insights.measurements(id,metric,from==null?end.minus(365,ChronoUnit.DAYS):from,end);}
+    public List<MeasurementSeries> measurements(String identifier,String metric,Instant from,Instant to){
+        Patient p=requireAssigned(identifier); UUID id=p.getId(); Instant end=to==null?clock.instant():to;
+        return insights.measurements(id,metric,from==null?end.minus(365,ChronoUnit.DAYS):from,end);
+    }
+    public List<MeasurementSeries> measurements(UUID id,String metric,Instant from,Instant to){return measurements(id.toString(),metric,from,to);}
 
     public DashboardResponse dashboard(){
         UUID clinicianId=current.requireCurrent().getId();
@@ -64,6 +70,13 @@ public class PatientQueryService {
         return new DashboardResponse(today,review);
     }
 
+    public Patient requireAssigned(String identifier){
+        if(identifier==null||identifier.isBlank())throw new ResourceNotFoundException("환자를 찾을 수 없습니다.");
+        UUID parsedUuid=null;
+        try{parsedUuid=UUID.fromString(identifier.trim());}catch(IllegalArgumentException ignored){}
+        Clinician c=current.requireCurrent();
+        return patients.findAssignedByIdOrNumber(c.getId(),parsedUuid,identifier.trim()).orElseThrow(()->new ResourceNotFoundException("환자를 찾을 수 없습니다."));
+    }
     public Patient requireAssigned(UUID id){Clinician c=current.requireCurrent();return patients.findAssignedById(c.getId(),id).orElseThrow(()->new ResourceNotFoundException("환자를 찾을 수 없습니다."));}
     private PatientRow row(Patient p){Optional<Encounter> e=latestEncounter(p.getId());Optional<Appointment>a=nextAppointment(p.getId());String code=e.map(Encounter::getDepartmentCode).or(()->a.map(Appointment::getDepartmentCode)).orElse(null);return new PatientRow(p.getId(),p.getPatientNumber(),p.getName(),p.getBirthDate(),age(p.getBirthDate()),p.getSexCode(),code,departmentName(code),e.map(Encounter::getOccurredAt).orElse(null),a.map(Appointment::getScheduledStart).orElse(null),insights.attentionCount(p.getId()));}
     private List<PrescriptionSummary> currentPrescriptions(UUID id){return group(prescriptions.findByPatientAndStatuses(id,List.of("ACTIVE"))).values().stream().map(records->{PrescriptionRecord h=records.get(0);return new PrescriptionSummary(h.prescriptionId(),h.prescribedAt(),h.status(),records.stream().map(r->new PrescriptionItemSummary(r.itemId(),r.medicationCode(),r.medicationName(),r.doseValue(),r.doseUnit(),r.frequencyPerDay(),r.route(),r.startDate(),r.endDate(),r.instructions())).toList());}).toList();}
@@ -73,5 +86,6 @@ public class PatientQueryService {
     private Optional<Appointment> nextAppointment(UUID id){return appointments.findFirstByPatientIdAndScheduledStartAfterAndStatusInOrderByScheduledStartAsc(id,clock.instant(),UPCOMING);}
     private String departmentName(String code){return code==null?null:departments.findById(code).map(Department::getDisplayName).orElse(code);}
     private int age(LocalDate birth){return Period.between(birth,LocalDate.now(clock.withZone(CLINIC_ZONE))).getYears();}
+    private static String formatPrescriptionTitle(String status){if(status==null)return "처방 기록";return switch(status.toUpperCase()){case "ACTIVE"->"유지 처방";case "SUPERSEDED"->"처방 변경";case "SUSPENDED","SUSPEND","STOPPED"->"처방 중단";case "CANCELLED","CANCELED"->"처방 취소";case "COMPLETED"->"처방 완료";default->"처방 내역";};}
     private static String trim(String v){return v==null?"":v.trim();} private static String normalize(String v){return trim(v).toUpperCase();} private static String valueOr(String v,String fallback){return v==null||v.isBlank()?fallback:v;}
 }

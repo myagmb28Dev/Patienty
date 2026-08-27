@@ -60,3 +60,19 @@ export function formatTrend(direction: string, delta?: number | null) {
   if (direction === "STABLE") return "유지";
   return "비교 자료 부족";
 }
+
+export function formatPrescriptionStatus(status?: string | null) {
+  if (!status) return "처방 기록";
+  const labels: Record<string, string> = {
+    ACTIVE: "유지 처방",
+    SUPERSEDED: "처방 변경",
+    SUSPENDED: "처방 중단",
+    SUSPEND: "처방 중단",
+    STOPPED: "처방 중단",
+    CANCELLED: "처방 취소",
+    CANCELED: "처방 취소",
+    COMPLETED: "처방 완료",
+  };
+  return labels[status.toUpperCase()] ?? status;
+}
+
