@@ -1,6 +1,7 @@
 # Patienty Initial Architecture
 
-> Status: Draft v0.1  
+> Status: Draft v0.1
+>
 > Scope: Local-first MVP using synthetic patient data only
 
 ## 1. Product definition
