@@ -25,7 +25,7 @@ export function MeasurementTrends({
   if (series.length === 0) {
     return (
       <EmptyState
-        message="비교할 수 있는 수치 검사 기록이 없어."
+        message="비교할 수 있는 수치 검사 기록이 없습니다."
         title="검사 결과 기록 없음"
       />
     );
@@ -149,7 +149,7 @@ function MeasurementCard({
       ) : (
         <div className="mt-5 flex h-32 items-center justify-center rounded-xl border border-dashed border-slate-300 text-sm text-slate-500">
           <ChartNoAxesCombined className="mr-2 size-5" aria-hidden />
-          추세를 계산하려면 측정값이 더 필요해.
+          추세를 계산하려면 측정값이 더 필요합니다.
         </div>
       )}
 

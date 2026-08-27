@@ -62,7 +62,7 @@ export function PatientDetailPage() {
       setError(
         detailResult.reason instanceof Error
           ? detailResult.reason.message
-          : "환자 기록을 불러오지 못했어.",
+          : "환자 기록을 불러오지 못했습니다.",
       );
       setLoading(false);
       return;
@@ -100,7 +100,7 @@ export function PatientDetailPage() {
     setEvidenceNotice(
       found
         ? ""
-        : "이 근거는 현재 불러온 기록 범위에 없어. 타임라인의 전체 기간을 조회하면 확인할 수 있어.",
+        : "이 근거는 현재 불러온 기록 범위에 없습니다. 타임라인의 전체 기간을 조회하면 확인하실 수 있습니다.",
     );
   }, []);
 
@@ -113,9 +113,9 @@ export function PatientDetailPage() {
   if (error || !detail) {
     return (
       <ErrorState
-        message={error || "사용 가능한 환자 기록이 없어."}
+        message={error || "사용 가능한 환자 기록이 없습니다."}
         onRetry={() => void load()}
-        title="환자 상세를 열지 못했어"
+        title="환자 상세를 열지 못했습니다"
       />
     );
   }
@@ -172,10 +172,10 @@ export function PatientDetailPage() {
         <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
           <AlertCircle className="mt-0.5 size-5 shrink-0" aria-hidden />
           <div>
-            <p className="font-black">일부 기록을 표시하지 못했어</p>
+            <p className="font-black">일부 기록을 표시하지 못했습니다</p>
             <p className="mt-1 text-xs leading-5">
               누락 범주: {Array.from(new Set(missingCategories)).join(", ")}.
-              보이는 기록만으로 요약했어.
+              조회된 기록만으로 요약했습니다.
             </p>
           </div>
         </div>
@@ -195,7 +195,7 @@ export function PatientDetailPage() {
           <section className="card p-5 sm:p-6">
             <SectionHeading
               icon={HeartPulse}
-              subtitle="같은 단위의 수치만 비교해 표시해."
+              subtitle="동일한 단위의 수치만 비교하여 표시합니다."
               title="검사 결과 변화"
             />
             <div className="mt-5">
@@ -210,7 +210,7 @@ export function PatientDetailPage() {
           <section className="card p-5 sm:p-6">
             <SectionHeading
               icon={ClipboardList}
-              subtitle="진료·검사·처방 기록을 시간순으로 모았어."
+              subtitle="진료·검사·처방 기록을 시간순으로 정리했습니다."
               title="최근 타임라인"
             />
             <div className="mt-5">
@@ -221,7 +221,7 @@ export function PatientDetailPage() {
           <section className="card p-5 sm:p-6">
             <SectionHeading
               icon={Pill}
-              subtitle="처방 기록이며, 실제 복용 여부를 의미하지 않아."
+              subtitle="처방 기록이며, 실제 복용 여부를 의미하지 않습니다."
               title="현재 처방"
             />
             <div className="mt-5">
@@ -314,7 +314,7 @@ function SummaryCard({
           10초 환자 요약
         </div>
         <p className="mt-4 text-lg font-bold leading-8 text-slate-900">
-          {detail.summary.text || "사용 가능한 요약 기록이 없어."}
+          {detail.summary.text || "사용 가능한 요약 기록이 없습니다."}
         </p>
       </div>
       <div className="p-5 sm:p-6">
@@ -322,7 +322,7 @@ function SummaryCard({
         {observations.length === 0 ? (
           <div className="mt-3 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800">
             <CheckCircle2 className="size-5" aria-hidden />
-            기록은 있지만 주목할 만한 변화가 감지되지 않았어.
+            기록은 있지만 주목할 만한 변화가 감지되지 않았습니다.
           </div>
         ) : (
           <div className="mt-3 grid gap-3 lg:grid-cols-2">
@@ -368,7 +368,7 @@ function Timeline({ items }: { items: TimelineItem[] }) {
   if (items.length === 0) {
     return (
       <EmptyState
-        message="표시할 진료·검사·처방 기록이 없어."
+        message="표시할 진료·검사·처방 기록이 없습니다."
         title="사용 가능한 기록 없음"
       />
     );
@@ -428,7 +428,7 @@ function Prescriptions({ items }: { items: PrescriptionView[] }) {
   if (items.length === 0) {
     return (
       <EmptyState
-        message="현재 활성 상태인 처방 기록이 없어."
+        message="현재 활성 상태인 처방 기록이 없습니다."
         title="사용 가능한 처방 기록 없음"
       />
     );

@@ -41,10 +41,10 @@ function LoginForm() {
     } catch (caught) {
       setError(
         caught instanceof ApiError && caught.status === 401
-          ? "이메일 또는 비밀번호를 다시 확인해줘."
+          ? "이메일 또는 비밀번호를 다시 확인해 주세요."
           : caught instanceof Error
             ? caught.message
-            : "로그인하지 못했어. 잠시 후 다시 시도해줘.",
+            : "로그인에 실패했습니다. 잠시 후 다시 시도해 주세요.",
       );
     } finally {
       setSubmitting(false);
@@ -78,7 +78,7 @@ function LoginForm() {
           id="password"
           minLength={8}
           onChange={(event) => setPassword(event.target.value)}
-          placeholder="비밀번호를 입력해줘"
+          placeholder="비밀번호를 입력하세요"
           required
           type="password"
           value={password}
@@ -110,9 +110,9 @@ function LoginForm() {
         )}
       </button>
       <p className="text-center text-xs leading-5 text-slate-500">
-        시연 계정은 프로젝트 README에서 확인할 수 있어.
+        시연 계정은 프로젝트 README에서 확인하실 수 있습니다.
         <br />
-        인증 정보는 브라우저 저장소에 보관하지 않아.
+        인증 정보는 브라우저 저장소에 보관되지 않습니다.
       </p>
     </form>
   );
@@ -141,11 +141,11 @@ export default function LoginPage() {
           <h1 className="mt-6 text-5xl font-black leading-[1.15] tracking-tight">
             흩어진 기록을 모아
             <br />
-            중요한 변화부터 보여줘.
+            중요한 변화부터 확인하세요.
           </h1>
           <p className="mt-6 max-w-lg text-lg leading-8 text-slate-300">
             진료, 검사, 처방 기록을 한눈에 정리하고 모든 AI 설명을 원본
-            근거까지 연결해.
+            근거까지 연결합니다.
           </p>
         </div>
         <div className="relative grid grid-cols-3 gap-3 text-sm">
@@ -181,10 +181,10 @@ export default function LoginPage() {
               합성 데이터 전용 데모
             </span>
             <h2 className="mt-5 text-3xl font-black tracking-tight text-slate-950">
-              다시 만나서 반가워!
+              의료진 로그인
             </h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              담당 환자의 최근 변화를 확인하려면 로그인해줘.
+              담당 환자의 최근 변화를 확인하려면 로그인해 주세요.
             </p>
             <Suspense fallback={<div className="mt-8 h-64 animate-pulse rounded-xl bg-slate-100" />}>
               <LoginForm />

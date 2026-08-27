@@ -88,7 +88,7 @@ export function PatientListPage() {
         }),
       );
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "환자 목록을 불러오지 못했어.");
+      setError(caught instanceof Error ? caught.message : "환자 목록을 불러오지 못했습니다.");
     } finally {
       setLoading(false);
     }
@@ -118,7 +118,7 @@ export function PatientListPage() {
           환자 찾기
         </h1>
         <p className="mt-2 text-sm text-slate-600">
-          이름이나 환자번호로 찾고, 최근 기록과 변화 표시를 바로 확인해.
+          이름이나 환자번호로 검색하여 최근 진료 기록과 상태 변화를 확인하세요.
         </p>
       </section>
 
@@ -198,12 +198,12 @@ export function PatientListPage() {
               actionLabel={hasFilters ? "필터 초기화" : undefined}
               message={
                 hasFilters
-                  ? "검색어나 필터를 조금 바꿔봐."
-                  : "현재 배정된 환자 기록이 없어."
+                  ? "검색어나 필터 조건을 변경해 보세요."
+                  : "현재 배정된 환자 기록이 없습니다."
               }
               onAction={hasFilters ? clearFilters : undefined}
               search
-              title={hasFilters ? "검색 결과가 없어" : "환자 기록 없음"}
+              title={hasFilters ? "검색 결과가 없습니다" : "환자 기록 없음"}
             />
           </div>
         ) : (

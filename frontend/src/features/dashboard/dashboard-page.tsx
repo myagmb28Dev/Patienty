@@ -31,7 +31,7 @@ export function DashboardPage() {
     try {
       setData(await dashboardApi.get());
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "대시보드를 불러오지 못했어.");
+      setError(caught instanceof Error ? caught.message : "대시보드를 불러오지 못했습니다.");
     } finally {
       setLoading(false);
     }
@@ -54,10 +54,10 @@ export function DashboardPage() {
         <div>
           <p className="text-sm font-bold text-teal-700">오늘의 진료 흐름</p>
           <h1 className="mt-1 text-3xl font-black tracking-tight text-slate-950">
-            {clinician?.name ?? "의료진"}님, 어디부터 볼까?
+            {clinician?.name ?? "의료진"}님, 환자 현황을 확인하세요
           </h1>
           <p className="mt-2 text-sm text-slate-600">
-            담당 환자의 예약과 최근 변화를 빠르게 확인할 수 있어.
+            담당 환자의 예약과 최근 변화를 빠르게 확인할 수 있습니다.
           </p>
         </div>
         <Link className="button-primary" href="/patients">
@@ -107,7 +107,7 @@ export function DashboardPage() {
                 <div>
                   <h2 className="section-title">오늘 예약</h2>
                   <p className="mt-1 text-sm text-slate-500">
-                    시간순으로 정리한 담당 환자 예약이야.
+                    시간순으로 정리한 담당 환자의 진료 예약입니다.
                   </p>
                 </div>
                 <Clock3 className="size-5 text-slate-400" aria-hidden />
@@ -116,7 +116,7 @@ export function DashboardPage() {
                 <SectionSkeleton rows={4} />
               ) : appointments.length === 0 ? (
                 <EmptyState
-                  message="오늘 예정된 담당 환자 예약이 없어."
+                  message="오늘 예정된 담당 환자 예약이 없습니다."
                   title="예약 기록 없음"
                 />
               ) : (
@@ -152,14 +152,14 @@ export function DashboardPage() {
               <div className="mb-5">
                 <h2 className="section-title">변화 검토 필요</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  진단이 아닌, 기록상 변화가 감지된 담당 환자야.
+                  진단이 아닌, 기록상 변화가 감지된 담당 환자입니다.
                 </p>
               </div>
               {loading ? (
                 <SectionSkeleton rows={4} />
               ) : attentionPatients.length === 0 ? (
                 <EmptyState
-                  message="현재 검토가 필요한 변화가 감지되지 않았어."
+                  message="현재 검토가 필요한 변화가 감지되지 않았습니다."
                   title="특이 변화 없음"
                 />
               ) : (
@@ -194,7 +194,7 @@ export function DashboardPage() {
               <div>
                 <h2 className="section-title">최근 확인한 환자</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  이 브라우저에서 최근 열어본 가상 환자야.
+                  이 브라우저에서 최근 열어본 가상 환자 목록입니다.
                 </p>
               </div>
               <Link className="text-sm font-bold text-teal-700 hover:text-teal-900" href="/patients">
@@ -203,7 +203,7 @@ export function DashboardPage() {
             </div>
             {recent.length === 0 ? (
               <EmptyState
-                message="환자 상세를 열면 여기에 바로가기 기록이 생겨."
+                message="환자 상세를 조회하면 여기에 바로가기 기록이 표시됩니다."
                 title="최근 확인 기록 없음"
               />
             ) : (

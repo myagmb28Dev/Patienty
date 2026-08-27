@@ -19,8 +19,8 @@ import { formatDateTime } from "@/lib/format";
 const suggestedQuestions = [
   "지난 진료 이후 변경된 사항은?",
   "최근 6개월간 검사 수치 변화는?",
-  "현재 복용 중인 약물을 정리해줘",
-  "최근 진료 이력을 시간순으로 정리해줘",
+  "현재 복용 중인 약물 정리",
+  "최근 진료 이력 시간순 정리",
 ];
 
 export function AiAssistant({
@@ -50,7 +50,7 @@ export function AiAssistant({
       setError(
         caught instanceof Error
           ? caught.message
-          : "AI 답변을 만들지 못했어. 원본 기록은 계속 확인할 수 있어.",
+          : "AI 답변을 생성하지 못했습니다. 원본 기록은 계속 확인하실 수 있습니다.",
       );
     } finally {
       setLoading(false);
@@ -71,7 +71,7 @@ export function AiAssistant({
           </div>
           <div>
             <h2 className="font-black">AI Assistant</h2>
-            <p className="text-xs text-slate-300">근거 기록만 사용해 답변해</p>
+            <p className="text-xs text-slate-300">근거 기록을 기반으로 답변합니다</p>
           </div>
         </div>
       </header>
@@ -82,10 +82,10 @@ export function AiAssistant({
             <div className="rounded-2xl bg-teal-50 p-4">
               <Sparkles className="size-5 text-teal-700" aria-hidden />
               <p className="mt-2 text-sm font-bold text-slate-900">
-                어떤 기록을 같이 살펴볼까?
+                어떤 기록을 확인하시겠습니까?
               </p>
               <p className="mt-1 text-xs leading-5 text-slate-600">
-                아래 질문을 선택하거나 직접 입력해봐. 진단과 치료 권고는 제공하지 않아.
+                아래 추천 질문을 선택하거나 직접 입력해 주세요. 진단 및 치료 권고는 제공하지 않습니다.
               </p>
             </div>
             <div className="mt-4 space-y-2">
@@ -114,7 +114,7 @@ export function AiAssistant({
               필요한 기록을 선별하는 중
             </p>
             <p className="mt-1 text-xs text-slate-500">
-              진료·검사·처방 근거를 확인하고 있어.
+              진료·검사·처방 근거를 확인하고 있습니다.
             </p>
           </div>
         )}
@@ -160,7 +160,7 @@ export function AiAssistant({
         />
         <div className="mt-2 flex items-center justify-between gap-3">
           <p className="text-[11px] leading-4 text-slate-500">
-            AI 설명은 원본 기록을 대신하지 않아.
+            AI 설명은 원본 기록을 대신하지 않습니다.
           </p>
           <button
             aria-label="질문 보내기"
