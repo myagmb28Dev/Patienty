@@ -1,0 +1,5 @@
+spring:
+  config:
+    import: optional:file:../.env.local[.properties]
+  flyway:
+    locations: classpath:db/migration,classpath:db/seed

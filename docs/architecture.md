@@ -1,8 +1,8 @@
 # Patienty Initial Architecture
 
-> Status: Draft v0.1
+> Status: Draft v0.2
 >
-> Scope: Local-first MVP using synthetic patient data only
+> Scope: Authenticated MVP using synthetic patient data only
 
 ## 1. Product definition
 
@@ -27,6 +27,7 @@ A clinician can open a patient and identify the following within 10 seconds:
   database directly.
 - Deterministic application code calculates numeric trends and medication changes.
 - Every AI observation must reference evidence supplied by the Context Builder.
+- Every patient query is scoped to the authenticated clinician's assignments.
 - The application uses synthetic data and displays that fact throughout the UI.
 - Local development is the default. AWS, Redis, a vector database, and RAG are not
   required for the MVP.
@@ -38,34 +39,46 @@ A clinician can open a patient and identify the following within 10 seconds:
 - EMR, insurance, billing, and pharmacy integrations;
 - patient-facing features;
 - appointment creation, cancellation, or live queue management;
-- multi-hospital tenancy and complex role management;
+- multi-hospital tenancy and fine-grained hospital RBAC beyond `DOCTOR` and `ADMIN`;
 - regulatory certification and cloud infrastructure.
 
 ## 2. MVP experience
 
-The MVP has three pages. The AI assistant is part of the patient detail page rather
+The MVP has four pages. The AI assistant is part of the patient detail page rather
 than a separate destination.
 
 ```mermaid
 flowchart LR
-    Dashboard[Dashboard] -->|Select patient| Detail[Patient detail]
+    Login[Login] --> Dashboard[Dashboard]
+    Dashboard -->|Select assigned patient| Detail[Patient detail]
     Patients[Patient list] -->|Search and select| Detail
     Detail -->|Ask a question| Assistant[AI assistant panel]
     Assistant -->|Open evidence| Detail
 ```
 
-### 2.1 Dashboard `/`
+### 2.1 Login `/login`
+
+- authenticate a seeded clinician with email and password;
+- establish a server-side session using an `HttpOnly` cookie;
+- obtain a session-backed CSRF token before state-changing requests;
+- redirect an authenticated clinician to the dashboard;
+- show a generic error for invalid credentials without revealing whether an email
+  exists.
+
+No access token or password is stored in browser storage.
+
+### 2.2 Dashboard `/`
 
 The dashboard is an entry point, not a large analytics product.
 
-- today's appointments;
-- patients with detected changes that need review;
+- today's appointments for the signed-in clinician's assigned patients;
+- assigned patients with detected changes that need review;
 - recently viewed patients, kept in browser storage for the MVP;
 - direct navigation to patient details.
 
 Department analytics, operational metrics, and large aggregate charts are deferred.
 
-### 2.2 Patient list `/patients`
+### 2.3 Patient list `/patients`
 
 - search by patient name or patient number;
 - filter by department and appointment status;
@@ -73,10 +86,14 @@ Department analytics, operational metrics, and large aggregate charts are deferr
 - show name, age, sex, department, last encounter date, and an attention indicator;
 - use server-side pagination.
 
+Search and filters operate only over patients assigned to the signed-in clinician.
+An administrator may receive a broader scope through an explicit backend policy;
+the frontend never decides this scope.
+
 Phone-number search is excluded initially because it adds little demonstration value
 and makes the product feel unnecessarily dependent on personal information.
 
-### 2.3 Patient detail `/patients/{patientId}`
+### 2.4 Patient detail `/patients/{patientId}`
 
 Desktop layout uses approximately two thirds of the width for the clinical record
 and one third for the assistant.
@@ -124,10 +141,12 @@ Patienty starts as a modular monolith with a separately deployed web client.
 flowchart TB
     Browser[Browser] --> Web[Next.js frontend]
     Web -->|REST / JSON| API[Spring Boot API]
+    API --> Auth[Authentication and assignment policy]
     API --> Patient[Patient module]
     API --> Clinical[Clinical record modules]
     API --> Insights[Insight module]
     API --> Assistant[Assistant module]
+    Auth --> DB[(PostgreSQL)]
     Patient --> DB[(PostgreSQL)]
     Clinical --> DB
     Insights --> DB
@@ -144,6 +163,7 @@ flowchart TB
 ```text
 backend/
 └── src/main/java/.../patienty/
+    ├── auth/             # session login, clinician identity, assignment policy
     ├── patient/          # identity, search, patient profile
     ├── appointment/      # scheduled visits and statuses
     ├── encounter/        # completed clinical encounters
@@ -164,6 +184,7 @@ cost of microservices now.
 frontend/src/
 ├── app/                  # Next.js routes and layouts
 ├── features/
+│   ├── auth/
 │   ├── dashboard/
 │   ├── patients/
 │   └── assistant/
@@ -177,19 +198,42 @@ filters, charts, evidence highlighting, and the assistant use Client Components.
 The Spring Boot OpenAPI document becomes the source for generated TypeScript API
 types once the first endpoints stabilize.
 
-### Local runtime
+### Runtime and environment files
 
 ```text
-Next.js :3000  -->  Spring Boot :8080  -->  PostgreSQL :5432
+Local:      Next.js :3000  -->  Spring Boot :8080  -->  PostgreSQL :5432
+Deployment: Next.js        -->  Spring Boot       -->  Neon Postgres
 ```
 
 PostgreSQL runs in Docker Compose. The frontend and backend run as local processes
 for fast reload and debugging. A full-container setup can be added for demos later.
 
+The repository uses two ignored runtime files:
+
+| File | Purpose |
+| --- | --- |
+| `.env.local` | Local frontend, backend, and Docker Compose values. |
+| `.env` | Deployment values, including the Neon connection settings. |
+
+Only `.env.example` is committed. It documents both modes without real secrets.
+The default `local` profile imports `.env.local`. Deployment activates `prod`
+or `prod,demo` through a CLI argument or hosting setting before the `prod`
+profile imports `.env`; profile activation is never delegated to a
+profile-specific env import.
+Neon uses separate `main` and `development` branches so schema work is verified
+before the deployment database is changed.
+
+The frontend sends session cookies with every API request. CORS allows only the
+configured frontend origin and credentials. Local cookies may use
+`SameSite=Lax; Secure=false`; cross-site HTTPS deployment uses
+`SameSite=None; Secure=true`.
+
 ## 4. Domain model
 
 ```mermaid
 erDiagram
+    CLINICIAN ||--o{ CLINICIAN_PATIENT_ASSIGNMENT : manages
+    PATIENT ||--o{ CLINICIAN_PATIENT_ASSIGNMENT : assigned_to
     PATIENT ||--o{ APPOINTMENT : schedules
     PATIENT ||--o{ ENCOUNTER : has
     DEPARTMENT ||--o{ APPOINTMENT : receives
@@ -208,6 +252,8 @@ erDiagram
 
 | Entity | Important fields | Notes |
 | --- | --- | --- |
+| `clinician` | `id`, `name`, `email`, `password_hash`, `role`, `active` | Authenticated medical staff account. Passwords are BCrypt hashes. |
+| `clinician_patient_assignment` | `clinician_id`, `patient_id`, `assigned_at` | The authorization boundary for doctor-visible patient data. |
 | `patient` | `id`, `patient_number`, `name`, `birth_date`, `sex_code`, `phone_normalized` | Age is calculated, never stored. |
 | `department` | `code`, `display_name` | Small reference table used for filtering. |
 | `appointment` | `patient_id`, `department_code`, `scheduled_start`, `scheduled_end`, `status`, `reason` | Read-only in the MVP. |
@@ -220,6 +266,10 @@ erDiagram
 
 ### Data rules
 
+- A clinician email is normalized and unique.
+- A clinician and patient pair has at most one active assignment.
+- Every patient-facing repository query includes the authenticated clinician scope.
+- An unassigned patient is returned as `404 Not Found` to avoid identifier probing.
 - Internal identifiers use UUIDs; `patient_number` is unique and safe for display.
 - Instants use PostgreSQL `timestamptz`; birth dates and medication periods use
   `date`.
@@ -227,6 +277,9 @@ erDiagram
   and `CANCELLED` preserve history.
 - Numeric results require a stable `metric_code` and unit. Trends only compare
   compatible units.
+- A prescription contains at most one instruction row for the same medication,
+  keeping medication-change comparisons deterministic.
+- An examination contains at most one result row for the same metric code.
 - Systolic and diastolic blood pressure are stored as separate metric codes and
   grouped by the same examination.
 - `reference_min` cannot exceed `reference_max`; dose and frequency values must be
@@ -238,6 +291,8 @@ erDiagram
 Primary query indexes are:
 
 ```text
+clinician(lower(email))
+clinician_patient_assignment(clinician_id, patient_id)
 patient(patient_number)
 patient(lower(name))
 encounter(patient_id, occurred_at desc)
@@ -254,16 +309,27 @@ manifest of source IDs and versions used to produce it.
 
 ## 5. API surface
 
-The initial API is read-heavy and versioned under `/api/v1`.
+The initial API is read-heavy and versioned under `/api/v1`. Except for the
+CSRF bootstrap and login endpoints, every endpoint requires an authenticated
+clinician session.
 
 | Method | Path | Purpose |
 | --- | --- | --- |
+| `GET` | `/api/v1/auth/csrf` | Create or reuse a session and return its CSRF token and header name. |
+| `POST` | `/api/v1/auth/login` | Authenticate a clinician and rotate the session identifier. |
+| `GET` | `/api/v1/auth/me` | Return the signed-in clinician's identity and role. |
+| `POST` | `/api/v1/auth/logout` | Invalidate the current clinician session. |
 | `GET` | `/api/v1/dashboard` | Today's appointments and patients needing review. |
 | `GET` | `/api/v1/patients` | Search, filter, sort, and page patients. |
 | `GET` | `/api/v1/patients/{patientId}` | Patient header, recent encounter, current prescriptions, and next appointment. |
 | `GET` | `/api/v1/patients/{patientId}/timeline` | Unified encounter, examination, and prescription-change timeline. |
 | `GET` | `/api/v1/patients/{patientId}/measurements` | Time-series values filtered by metric and period. |
 | `POST` | `/api/v1/patients/{patientId}/ai/queries` | Evidence-backed answer for one patient question. |
+
+The dashboard and every patient endpoint derive their clinician scope from the
+server session. They never accept a clinician ID from a request parameter or body.
+Patient detail, timeline, measurements, and AI queries return `404 Not Found` when
+the patient is not assigned to the signed-in clinician.
 
 Example patient query:
 
@@ -322,9 +388,11 @@ for clinical certainty.
 
 ```mermaid
 flowchart LR
+    Session[Authenticated clinician] --> Scope[Assignment check]
     Question --> Intent[Intent resolver]
     Intent --> Plan[Context query plan]
-    Plan --> Query[Patient-scoped SQL queries]
+    Scope --> Query[Clinician-and-patient-scoped SQL queries]
+    Plan --> Query
     Query --> Normalize[Normalize and sort context items]
     Normalize --> Rules[Calculate deterministic trends and changes]
     Rules --> Generator[AI answer generator]
@@ -355,8 +423,9 @@ ContextItem
 └── facts
 ```
 
-The server chooses the patient, time range, record types, and maximum result count.
-The LLM cannot generate SQL, call repositories, or fetch more records.
+The server first verifies the clinician assignment, then chooses the patient, time
+range, record types, and maximum result count. The LLM cannot generate SQL, call
+repositories, or fetch more records.
 
 ### Provider boundary
 
@@ -382,6 +451,8 @@ answers. This allows end-to-end development and testing without API cost.
 
 ### Safety invariants
 
+- No patient context is built before the signed-in clinician's assignment is
+  verified.
 - Diagnosis, treatment, and medication recommendation requests return
   `UNSUPPORTED_REQUEST`.
 - Every generated observation contains at least one evidence ID.
@@ -394,6 +465,11 @@ answers. This allows end-to-end development and testing without API cost.
 - Provider timeouts or invalid output do not prevent access to source records.
 
 ## 7. Synthetic data strategy
+
+Seed two deterministic demo clinicians with BCrypt password hashes and different
+assignment sets containing doctor-exclusive patients. Authorization tests use
+those accounts to prove that one doctor cannot discover or open an exclusively
+assigned patient belonging to the other doctor.
 
 Start with 10–20 deterministic patient stories rather than 1,000 random patients.
 Each story should make one behavior easy to verify:
@@ -414,6 +490,9 @@ testing.
 
 ### Backend
 
+- authentication tests for login, logout, session fixation protection, and CSRF;
+- authorization tests proving list, detail, timeline, measurement, and AI queries
+  cannot cross clinician assignments;
 - repository and service tests for patient-scoped, time-bounded context selection;
 - unit tests for measurement trends, unit mismatches, and prescription diffs;
 - contract tests ensuring every AI observation has valid evidence;
@@ -422,6 +501,8 @@ testing.
 
 ### Frontend
 
+- login, logout, authentication bootstrap, and unauthorized-redirect tests;
+- tests proving no access token or password is written to browser storage;
 - component tests for loading, empty, partial, error, and evidence states;
 - tests for search/filter URL state and server pagination;
 - chart tests that preserve units and accessible labels;
@@ -430,6 +511,8 @@ testing.
 
 ### Architecture checks
 
+- no patient query executes without an authenticated clinician assignment scope;
+- CSRF and credentialed CORS remain enabled for every state-changing request;
 - the assistant has no direct repository implementation dependency;
 - no AI provider receives records outside the Context Builder result;
 - no real patient data, credentials, or `.env` files are committed;
@@ -440,21 +523,24 @@ testing.
 Each slice is completed from migration through API, generated client, UI, and tests.
 
 1. **Project skeleton** — Spring Boot, Next.js, PostgreSQL Compose, health checks.
-2. **Patient discovery** — deterministic seed data, patient list, search, filters.
-3. **10-second patient view** — patient header, recent timeline, prescriptions,
+2. **Authentication and assignments** — clinician login, sessions, CSRF, patient
+   assignments, route protection, and cross-clinician access tests.
+3. **Patient discovery** — deterministic seed data, patient list, search, filters.
+4. **10-second patient view** — patient header, recent timeline, prescriptions,
    next appointment.
-4. **Measurement trends** — normalized results, trend calculation, charts.
-5. **Evidence-backed summary** — deterministic insights and evidence navigation.
-6. **Assistant** — supported intents, rule-based provider, structured answers.
-7. **Optional LLM** — external provider behind the existing interface and disabled
+5. **Measurement trends** — normalized results, trend calculation, charts.
+6. **Evidence-backed summary** — deterministic insights and evidence navigation.
+7. **Assistant** — supported intents, rule-based provider, structured answers.
+8. **Optional LLM** — external provider behind the existing interface and disabled
    by default.
-8. **Dashboard** — focused entry points built from the stable patient APIs.
+9. **Dashboard** — focused entry points built from the stable patient APIs.
 
-## 10. Decisions required before implementation
+## 10. Confirmed implementation decisions
 
-The following choices can be made when the project skeleton is created:
-
-1. Java package namespace, proposed as `dev.patienty`;
-2. demo authentication: no login in local development or one seeded clinician;
-3. UI language: Korean first with English identifiers in code and APIs;
-4. the optional LLM provider and an explicit development spending limit.
+1. Java package namespace is `dev.patienty`.
+2. Session-based login uses two seeded demo doctors with different patient
+   assignments; no token is stored in browser storage.
+3. UI language is Korean first with English identifiers in code and APIs.
+4. The MVP uses only the rule-based AI provider, so it has no external AI cost.
+5. Local development uses Docker PostgreSQL through `.env.local`; deployment uses
+   Neon Postgres through `.env`; only the combined `.env.example` is committed.

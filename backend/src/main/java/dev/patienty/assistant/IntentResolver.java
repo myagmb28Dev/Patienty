@@ -1,0 +1,5 @@
+package dev.patienty.assistant;
+import java.util.*;import org.springframework.stereotype.Component;
+@Component public class IntentResolver {private static final Set<String> UNSUPPORTED=Set.of("진단","치료해","치료법","처방해","약 추천","복용해야","diagnose","diagnosis","treatment advice","recommend medication","prescribe");
+    public AssistantIntent resolve(String question){String q=question.toLowerCase(Locale.ROOT);if(UNSUPPORTED.stream().anyMatch(q::contains))return AssistantIntent.UNSUPPORTED;if(any(q,"약물","처방","medication","prescription"))return AssistantIntent.MEDICATION_CHANGES;if(any(q,"혈압","혈당","콜레스테롤","수치","추이","trend"))return AssistantIntent.MEASUREMENT_TREND;if(any(q,"검사","examination","lab result"))return AssistantIntent.RECENT_EXAMINATIONS;if(any(q,"진료 이력","타임라인","방문","encounter","timeline"))return AssistantIntent.ENCOUNTER_TIMELINE;return AssistantIntent.RECENT_CHANGES;}
+    private static boolean any(String value,String... candidates){return Arrays.stream(candidates).anyMatch(value::contains);}}

@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f4f7f8;
+  --foreground: #162a32;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--background);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family:
+    Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", Inter, ui-sans-serif,
+    system-ui, sans-serif;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  outline-offset: 2px;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled),
+select:not(:disabled) {
+  cursor: pointer;
+}
+
+::selection {
+  background: #99f6e4;
+  color: #102a33;
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)];
+  }
+
+  .button-primary {
+    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-teal-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-teal-800 focus-visible:outline-2 focus-visible:outline-teal-600 disabled:cursor-not-allowed disabled:opacity-55;
+  }
+
+  .button-secondary {
+    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-teal-600 disabled:cursor-not-allowed disabled:opacity-55;
+  }
+
+  .field {
+    @apply min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 transition placeholder:text-slate-400 focus:border-teal-600 focus:outline-none focus:ring-3 focus:ring-teal-100;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-bold;
+  }
+
+  .section-title {
+    @apply text-base font-black tracking-tight text-slate-900;
+  }
+}
+
+[data-evidence-target="true"] {
+  scroll-margin-top: 9rem;
+}
+
+.evidence-highlight {
+  animation: evidence-flash 2.4s ease-out;
+}
+
+@keyframes evidence-flash {
+  0%,
+  35% {
+    border-color: #0d9488;
+    background: #ccfbf1;
+    box-shadow: 0 0 0 4px rgb(20 184 166 / 0.17);
+  }
+  100% {
+    border-color: inherit;
+    background: inherit;
+    box-shadow: none;
+  }
+}

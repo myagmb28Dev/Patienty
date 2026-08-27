@@ -2,9 +2,14 @@
 .codex/
 .agent/
 .agents/
+AGENTS.md
+CLAUDE.md
+**/AGENTS.md
+**/CLAUDE.md
 
 # Environment variables
 .env
+.env.local
 .env.*
 !.env.example
 
