@@ -1,4 +1,4 @@
-name: Render Free Instance Keep-Alive
+name: Keep-Alive
 
 on:
   schedule:
