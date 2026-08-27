@@ -1,4 +1,4 @@
-name: Sync Environment Variables on Merge
+name: Sync Env
 
 on:
   pull_request:
