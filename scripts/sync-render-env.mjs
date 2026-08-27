@@ -1,20 +1,36 @@
 import fs from "node:fs";
 import path from "node:path";
-import { parse } from "dotenv";
+
+function parseEnv(content) {
+  const result = {};
+  const lines = content.split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const match = trimmed.match(/^([^=]+)=(.*)$/);
+    if (match) {
+      const key = match[1].trim();
+      let value = match[2].trim();
+      if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+        value = value.slice(1, -1);
+      }
+      result[key] = value;
+    }
+  }
+  return result;
+}
 
 const rootDir = process.cwd();
 const envPath = path.resolve(rootDir, ".env");
 
 if (!fs.existsSync(envPath)) {
-  console.log("No .env file found at project root. Skipping Render sync.");
   process.exit(0);
 }
 
-const envConfig = parse(fs.readFileSync(envPath));
+const envConfig = parseEnv(fs.readFileSync(envPath, "utf-8"));
 const apiKey = envConfig.RENDER_API_KEY || process.env.RENDER_API_KEY;
 
 if (!apiKey) {
-  console.log("RENDER_API_KEY not found in .env or environment. Skipping Render sync.");
   process.exit(0);
 }
 
