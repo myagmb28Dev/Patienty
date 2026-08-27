@@ -112,30 +112,33 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <main className="grid min-h-screen bg-[#eef4f4] lg:grid-cols-[1.05fr_.95fr]">
-      <section className="relative hidden overflow-hidden bg-[#102a33] p-12 text-white lg:flex lg:flex-col lg:justify-between">
-        <div className="absolute -right-32 -top-28 size-96 rounded-full bg-teal-400/10" />
-        <div className="absolute -bottom-40 -left-24 size-[30rem] rounded-full bg-cyan-300/10" />
+    <main className="grid min-h-screen bg-slate-50/60 lg:grid-cols-[1.1fr_.9fr]">
+      <section className="relative hidden overflow-hidden border-r border-slate-800 bg-[#0f172a] p-12 text-white lg:flex lg:flex-col lg:justify-between">
+        <div className="absolute -right-24 -top-24 size-80 rounded-full bg-slate-800/30 blur-2xl" />
+        <div className="absolute -bottom-32 -left-20 size-96 rounded-full bg-slate-800/40 blur-3xl" />
+        
         <div className="relative">
-          <p className="text-2xl font-black tracking-tight text-white">Patienty</p>
+          <p className="text-xl font-bold tracking-tight text-white">Patienty</p>
         </div>
-        <div className="relative max-w-xl">
-          <span className="inline-flex items-center gap-2 rounded-full border border-teal-300/20 bg-teal-300/10 px-3 py-1.5 text-sm font-bold text-teal-200">
-            <Activity className="size-4" aria-hidden />
+
+        <div className="relative max-w-lg">
+          <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/80 px-3.5 py-1.5 text-xs font-medium text-slate-300">
+            <Activity className="size-3.5 text-slate-300" aria-hidden />
             환자의 변화를 10초 안에
           </span>
-          <h1 className="mt-6 text-5xl font-black leading-[1.15] tracking-tight">
+          <h1 className="mt-6 text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl">
             흩어진 기록을 모아
             <br />
             중요한 변화부터 확인하세요.
           </h1>
-          <p className="mt-6 max-w-lg text-lg leading-8 text-slate-300">
+          <p className="mt-5 text-base leading-relaxed text-slate-400">
             진료, 검사, 처방 기록을 한눈에 정리하고
             <br />
             모든 요약과 분석을 원본 근거 기록까지 연결합니다.
           </p>
         </div>
-        <div className="relative grid grid-cols-3 gap-3 text-sm">
+
+        <div className="relative grid grid-cols-3 gap-3 text-xs">
           {[
             [ClipboardList, "임상 진료 기록"],
             [HeartPulse, "검사 수치 추이"],
@@ -144,27 +147,27 @@ export default function LoginPage() {
             const FeatureIcon = Icon as typeof ClipboardList;
             return (
               <div
-                className="rounded-xl border border-white/10 bg-white/5 p-3"
+                className="rounded-xl border border-slate-800 bg-slate-850/60 bg-slate-800/50 p-3.5"
                 key={label as string}
               >
-                <FeatureIcon className="mb-2 size-5 text-teal-300" aria-hidden />
-                <p className="font-bold text-slate-200">{label as string}</p>
+                <FeatureIcon className="mb-2 size-4 text-slate-300" aria-hidden />
+                <p className="font-semibold text-slate-200">{label as string}</p>
               </div>
             );
           })}
         </div>
       </section>
 
-      <section className="flex items-center justify-center p-5 sm:p-10">
+      <section className="flex items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-md">
-          <div className="mb-7 flex items-center gap-3 lg:hidden">
-            <p className="text-2xl font-black text-slate-900">Patienty</p>
+          <div className="mb-8 flex items-center gap-2 lg:hidden">
+            <p className="text-xl font-bold tracking-tight text-slate-900">Patienty</p>
           </div>
-          <div className="card p-6 sm:p-9">
-            <h2 className="text-3xl font-black tracking-tight text-slate-950">
+          <div className="card p-7 sm:p-10 shadow-xs border border-slate-200/90 bg-white rounded-2xl">
+            <h2 className="text-2xl font-bold tracking-tight text-slate-900">
               의료진 로그인
             </h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
+            <p className="mt-1.5 text-xs text-slate-500">
               담당 환자의 최근 변화를 확인하려면 로그인해 주세요.
             </p>
             <Suspense fallback={<div className="mt-8 h-64 animate-pulse rounded-xl bg-slate-100" />}>
