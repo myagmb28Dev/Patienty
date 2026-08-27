@@ -60,9 +60,6 @@ services:
     dockerfilePath: ./frontend/Dockerfile
     plan: free
     region: oregon
-    dockerBuildArgs:
-      - key: NEXT_PUBLIC_API_BASE_URL
-        value: https://patienty-backend.onrender.com
     envVars:
       - key: NEXT_PUBLIC_API_BASE_URL
         value: https://patienty-backend.onrender.com
