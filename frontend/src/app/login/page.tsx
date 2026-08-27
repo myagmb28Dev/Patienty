@@ -114,7 +114,6 @@ export default function LoginPage() {
   return (
     <main className="grid min-h-screen bg-slate-50/60 lg:grid-cols-[1.1fr_.9fr]">
       <section className="relative hidden overflow-hidden border-r border-slate-800 bg-[#0f172a] p-12 text-white lg:flex lg:flex-col lg:justify-between">
-        {/* 우아하고 은은한 배경 원형 그래픽 데코레이션 */}
         <div className="pointer-events-none absolute -right-24 -top-24 size-[26rem] rounded-full bg-teal-500/15 blur-2xl animate-orb-1" />
         <div className="pointer-events-none absolute -right-36 -top-36 size-[32rem] rounded-full border border-teal-500/15 animate-ring-slow" />
         <div className="pointer-events-none absolute -bottom-36 -left-24 size-[32rem] rounded-full bg-slate-700/30 blur-3xl animate-orb-2" />

@@ -145,7 +145,6 @@ select:not(:disabled) {
   }
 }
 
-/* 로그인 화면 배경 원형 그라데이션 은은한 모션 애니메이션 */
 @keyframes orb-float-1 {
   0%, 100% {
     transform: translate(0, 0) scale(1);
