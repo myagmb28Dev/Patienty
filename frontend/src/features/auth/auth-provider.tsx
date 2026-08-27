@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 import { authApi, ApiError } from "@/lib/api/client";
 import type { Clinician } from "@/lib/api/types";
 import { clearRecentPatients } from "@/lib/recent-patients";
@@ -19,26 +20,30 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [clinician, setClinician] = useState<Clinician | null>(null);
-  const [status, setStatus] = useState<AuthStatus>("loading");
+  const pathname = usePathname();
+  const [status, setStatus] = useState<AuthStatus>(() =>
+    pathname === "/login" ? "unauthenticated" : "loading"
+  );
 
   const refresh = useCallback(async () => {
     try {
       const current = await authApi.me();
       setClinician(current);
       setStatus("authenticated");
-    } catch (error) {
-      if (!(error instanceof ApiError) || error.status !== 401) {
-        console.warn("Unable to bootstrap the clinician session.");
-      }
+    } catch {
       setClinician(null);
       setStatus("unauthenticated");
     }
   }, []);
 
   useEffect(() => {
+    if (pathname === "/login") {
+      setStatus("unauthenticated");
+      return;
+    }
     const frame = window.requestAnimationFrame(() => void refresh());
     return () => window.cancelAnimationFrame(frame);
-  }, [refresh]);
+  }, [pathname, refresh]);
 
   useEffect(() => {
     const handleUnauthorized = () => {
