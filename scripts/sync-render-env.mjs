@@ -42,6 +42,7 @@ const authHeader = {
 
 const LOCAL_ONLY_KEYS = new Set([
   "RENDER_API_KEY",
+  "SPRING_DATASOURCE_URL",
   "POSTGRES_DB",
   "POSTGRES_USER",
   "POSTGRES_PASSWORD",
