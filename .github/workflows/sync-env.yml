@@ -1,0 +1,42 @@
+name: Sync Environment Variables on Merge
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync-render-env:
+    name: Sync Render Environment Variables
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'feature/'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+
+      - name: Sync Backend Environment Variables
+        if: env.RENDER_API_KEY != '' && env.RENDER_BACKEND_SERVICE_ID != ''
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_BACKEND_SERVICE_ID }}
+          RENDER_ENV_VARS_JSON: ${{ secrets.RENDER_BACKEND_ENV_JSON }}
+        run: node scripts/sync-render-env.mjs
+
+      - name: Sync Frontend Environment Variables
+        if: env.RENDER_API_KEY != '' && env.RENDER_FRONTEND_SERVICE_ID != ''
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_FRONTEND_SERVICE_ID }}
+          RENDER_ENV_VARS_JSON: ${{ secrets.RENDER_FRONTEND_ENV_JSON }}
+        run: node scripts/sync-render-env.mjs
