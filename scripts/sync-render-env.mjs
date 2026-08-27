@@ -1,46 +1,89 @@
-const RENDER_API_KEY = process.env.RENDER_API_KEY;
-const SERVICE_ID = process.env.RENDER_SERVICE_ID;
-const ENV_VARS_JSON = process.env.RENDER_ENV_VARS_JSON;
+import fs from "node:fs";
+import path from "node:path";
+import { parse } from "dotenv";
 
-if (!RENDER_API_KEY || !SERVICE_ID || !ENV_VARS_JSON) {
-  console.log("Skipping Render env sync: RENDER_API_KEY, RENDER_SERVICE_ID, or RENDER_ENV_VARS_JSON not set.");
+const rootDir = process.cwd();
+const envPath = path.resolve(rootDir, ".env");
+
+if (!fs.existsSync(envPath)) {
+  console.log("No .env file found at project root. Skipping Render sync.");
   process.exit(0);
 }
 
-async function syncEnvVars() {
-  let envVars;
-  try {
-    envVars = JSON.parse(ENV_VARS_JSON);
-  } catch (error) {
-    console.error("Invalid JSON format in RENDER_ENV_VARS_JSON:", error);
-    process.exit(1);
-  }
+const envConfig = parse(fs.readFileSync(envPath));
+const apiKey = envConfig.RENDER_API_KEY || process.env.RENDER_API_KEY;
 
+if (!apiKey) {
+  console.log("RENDER_API_KEY not found in .env or environment. Skipping Render sync.");
+  process.exit(0);
+}
+
+const authHeader = {
+  "Accept": "application/json",
+  "Content-Type": "application/json",
+  "Authorization": `Bearer ${apiKey}`,
+};
+
+async function getServices() {
+  const res = await fetch("https://api.render.com/v1/services?limit=50", {
+    headers: authHeader,
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to fetch Render services: ${res.status} ${await res.text()}`);
+  }
+  return (await res.json()).map((item) => item.service);
+}
+
+async function updateServiceEnvVars(serviceId, serviceName, envVars) {
   const payload = Object.entries(envVars).map(([key, value]) => ({
     key,
     value: String(value),
   }));
 
-  const response = await fetch(`https://api.render.com/v1/services/${SERVICE_ID}/env-vars`, {
+  const res = await fetch(`https://api.render.com/v1/services/${serviceId}/env-vars`, {
     method: "PUT",
-    headers: {
-      "Accept": "application/json",
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${RENDER_API_KEY}`,
-    },
+    headers: authHeader,
     body: JSON.stringify(payload),
   });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`Failed to sync env vars to Render service ${SERVICE_ID}:`, response.status, errorText);
-    process.exit(1);
+  if (!res.ok) {
+    throw new Error(`Failed to update env vars for ${serviceName} (${serviceId}): ${res.status} ${await res.text()}`);
   }
 
-  console.log(`Successfully synced ${payload.length} environment variables to Render service ${SERVICE_ID}.`);
+  console.log(`[Render Sync] Successfully updated ${payload.length} environment variables for ${serviceName}.`);
 }
 
-syncEnvVars().catch((err) => {
-  console.error("Unexpected error syncing Render env vars:", err);
-  process.exit(1);
-});
+async function run() {
+  try {
+    const services = await getServices();
+    const backend = services.find((s) => s.name === "patienty-backend");
+    const frontend = services.find((s) => s.name === "patienty-frontend");
+
+    const backendVars = {};
+    const frontendVars = {};
+
+    for (const [key, value] of Object.entries(envConfig)) {
+      if (key === "RENDER_API_KEY") continue;
+
+      if (key.startsWith("NEXT_PUBLIC_")) {
+        frontendVars[key] = value;
+      } else {
+        backendVars[key] = value;
+      }
+    }
+
+    if (backend && Object.keys(backendVars).length > 0) {
+      await updateServiceEnvVars(backend.id, backend.name, backendVars);
+    }
+
+    if (frontend && Object.keys(frontendVars).length > 0) {
+      await updateServiceEnvVars(frontend.id, frontend.name, frontendVars);
+    }
+
+    console.log("[Render Sync] All environment variables are synchronized with Render.");
+  } catch (error) {
+    console.error("[Render Sync] Error:", error.message);
+  }
+}
+
+run();
