@@ -10,7 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useAuth } from "@/features/auth/auth-provider";
-import { ApiError } from "@/lib/api/client";
+import { ApiError, authApi } from "@/lib/api/client";
 
 function LoginForm() {
   const router = useRouter();
@@ -19,6 +19,10 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    void authApi.csrf().catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -57,6 +61,7 @@ function LoginForm() {
           autoComplete="username"
           className="field"
           id="email"
+          name="email"
           onChange={(event) => setEmail(event.target.value)}
           placeholder="이메일을 입력하세요"
           required
@@ -72,6 +77,7 @@ function LoginForm() {
           autoComplete="current-password"
           className="field"
           id="password"
+          name="password"
           minLength={8}
           onChange={(event) => setPassword(event.target.value)}
           placeholder="비밀번호를 입력하세요"
