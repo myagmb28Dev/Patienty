@@ -30,7 +30,8 @@ services:
       - key: PATIENTY_AI_PROVIDER
         value: openrouter
       - key: PATIENTY_AI_OPENROUTER_MODEL
-        value: google/gemini-2.0-flash-001
+        value: google/gemini-2.5-flash
+
 
   # ------------------------------------------------------------
   # Frontend Web Service (Next.js 16 / React 19)
