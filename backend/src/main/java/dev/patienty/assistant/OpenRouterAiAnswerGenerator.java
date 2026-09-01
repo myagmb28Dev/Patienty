@@ -37,12 +37,13 @@ public class OpenRouterAiAnswerGenerator implements AiAnswerGenerator {
 
     public OpenRouterAiAnswerGenerator(
             @Value("${patienty.ai.openrouter.api-key:}") String apiKey,
-            @Value("${patienty.ai.openrouter.model:google/gemini-2.0-flash-001}") String model,
+            @Value("${patienty.ai.openrouter.model:google/gemini-2.5-flash}") String model,
             @Value("${patienty.ai.openrouter.base-url:https://openrouter.ai/api/v1}") String baseUrl,
             RuleBasedAiAnswerGenerator fallback) {
         this.apiKey = apiKey != null ? apiKey.trim() : "";
-        this.model = model != null && !model.isBlank() ? model.trim() : "google/gemini-2.0-flash-001";
+        this.model = model != null && !model.isBlank() ? model.trim() : "google/gemini-2.5-flash";
         this.baseUrl = baseUrl != null && !baseUrl.isBlank() ? baseUrl.trim() : "https://openrouter.ai/api/v1";
+
         this.fallback = fallback;
         this.objectMapper = new ObjectMapper();
 

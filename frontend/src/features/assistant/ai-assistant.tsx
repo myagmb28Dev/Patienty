@@ -35,6 +35,7 @@ export function AiAssistant({
   const [question, setQuestion] = useState("");
   const [lastQuestion, setLastQuestion] = useState("");
   const [response, setResponse] = useState<AiResponse | null>(null);
+  const [streamingText, setStreamingText] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -44,10 +45,16 @@ export function AiAssistant({
     setQuestion(clean);
     setLastQuestion(clean);
     setLoading(true);
+    setStreamingText("");
+    setResponse(null);
     setError("");
 
     try {
-      setResponse(await patientsApi.ask(patientId, clean));
+      const res = await patientsApi.askStream(patientId, clean, (chunk) => {
+        setStreamingText((prev) => prev + chunk);
+      });
+      setResponse(res);
+      setStreamingText("");
     } catch (caught) {
       setError(
         caught instanceof Error
@@ -56,8 +63,10 @@ export function AiAssistant({
       );
     } finally {
       setLoading(false);
+      setStreamingText("");
     }
   };
+
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -77,8 +86,8 @@ export function AiAssistant({
               <p className="text-[11px] text-slate-400">진료·검사·처방 기반 요약 검색</p>
             </div>
           </div>
-          <span className="badge border-slate-700 bg-slate-800/80 text-[10px] font-medium text-slate-300">
-            데이터 분석
+          <span className="badge border-slate-700 bg-slate-800/80 text-[10px] font-medium text-slate-300 whitespace-nowrap shrink-0">
+            AI 데이터 분석
           </span>
         </div>
       </header>
@@ -91,13 +100,14 @@ export function AiAssistant({
                 의무기록 항목별 빠른 조회
               </p>
               <p className="mt-1 text-[11px] leading-relaxed text-slate-500">
-                조회할 항목을 선택하거나 하단에 검색어를 입력하면 환자의 진료·검사·처방 기록을 분석하여 핵심 요약과 원본 근거를 제공합니다.
+                조회할 항목을 선택하거나 하단에 질문을 입력하면 AI가 환자의 진료·검사·처방 기록을 종합 분석하여 핵심 요약과 원본 근거를 제공합니다.
               </p>
             </div>
             <div className="space-y-1.5">
               <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                 주요 조회 항목
               </p>
+
               {suggestedQueries.map(({ label, icon: Icon, query }) => (
                 <button
                   className="flex w-full items-center gap-2.5 rounded-lg border border-slate-200/90 bg-white p-2.5 text-left transition hover:border-slate-300 hover:bg-slate-50 shadow-2xs"
@@ -116,16 +126,32 @@ export function AiAssistant({
         )}
 
         {loading && (
-          <div className="flex min-h-52 flex-col items-center justify-center text-center" role="status">
-            <LoaderCircle className="size-6 animate-spin text-slate-700" aria-hidden />
-            <p className="mt-3 text-sm font-bold text-slate-800">
-              의무기록 분석 중
-            </p>
-            <p className="mt-1 text-xs text-slate-500">
-              진료, 검사 결과, 처방 이력을 확인하고 있습니다.
-            </p>
+          <div className="space-y-3">
+            {streamingText ? (
+              <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-2xs">
+                <div className="flex items-center gap-2 mb-1.5 text-xs font-bold text-slate-700">
+                  <FileText className="size-3.5 text-slate-600" aria-hidden />
+                  <span>실시간 기록 분석 및 작성 중...</span>
+                </div>
+                <p className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed text-slate-800 font-medium">
+                  {streamingText}
+                  <span className="inline-block w-1.5 h-4 ml-0.5 bg-teal-600 animate-pulse align-middle" />
+                </p>
+              </div>
+            ) : (
+              <div className="flex min-h-52 flex-col items-center justify-center text-center" role="status">
+                <LoaderCircle className="size-6 animate-spin text-slate-700" aria-hidden />
+                <p className="mt-3 text-sm font-bold text-slate-800">
+                  의무기록 분석 중
+                </p>
+                <p className="mt-1 text-xs text-slate-500">
+                  진료, 검사 결과, 처방 이력을 확인하고 있습니다.
+                </p>
+              </div>
+            )}
           </div>
         )}
+
 
         {error && !loading && (
           <div className="rounded-xl border border-rose-200 bg-rose-50/80 p-4" role="alert">
@@ -169,8 +195,8 @@ export function AiAssistant({
           />
         </div>
         <div className="mt-2 flex items-center justify-between gap-3">
-          <p className="text-[10px] text-slate-400">
-            의무기록 기반 참고용 분석
+          <p className="text-[10px] text-slate-400 whitespace-nowrap">
+            AI 의무기록 분석 기반 · 임상 참고용
           </p>
           <button
             aria-label="기록 검색"
@@ -178,6 +204,7 @@ export function AiAssistant({
             disabled={!question.trim() || loading}
             type="submit"
           >
+
             <Search className="size-3.5" aria-hidden />
             조회하기
           </button>

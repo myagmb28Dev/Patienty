@@ -30,9 +30,10 @@ public class PatientQueryService {
     public PageResponse<PatientRow> search(String query,String department,String status,int page,int size){
         if(page<0||size<1||size>100)throw new IllegalArgumentException("page는 0 이상, size는 1~100이어야 합니다.");
         String normalizedStatus=normalize(status); if(!normalizedStatus.isEmpty()&&!STATUSES.contains(normalizedStatus))throw new IllegalArgumentException("지원하지 않는 예약 상태입니다.");
-        Page<Patient> result=patients.searchAssigned(current.requireCurrent().getId(),trim(query),normalize(department),normalizedStatus,PageRequest.of(page,size));
+        Page<Patient> result=patients.searchAssigned(current.requireCurrent().getId(),escapeLike(query),normalize(department),normalizedStatus,PageRequest.of(page,size));
         return PageResponse.from(result,result.getContent().stream().map(this::row).toList());
     }
+
 
     public PatientDetail detail(String identifier){
         Patient p=requireAssigned(identifier); UUID patientId=p.getId(); Optional<Encounter> encounter=latestEncounter(patientId); Optional<Appointment> next=nextAppointment(patientId);
@@ -88,4 +89,9 @@ public class PatientQueryService {
     private int age(LocalDate birth){return Period.between(birth,LocalDate.now(clock.withZone(CLINIC_ZONE))).getYears();}
     private static String formatPrescriptionTitle(String status){if(status==null)return "처방 기록";return switch(status.toUpperCase()){case "ACTIVE"->"유지 처방";case "SUPERSEDED"->"처방 변경";case "SUSPENDED","SUSPEND","STOPPED"->"처방 중단";case "CANCELLED","CANCELED"->"처방 취소";case "COMPLETED"->"처방 완료";default->"처방 내역";};}
     private static String trim(String v){return v==null?"":v.trim();} private static String normalize(String v){return trim(v).toUpperCase();} private static String valueOr(String v,String fallback){return v==null||v.isBlank()?fallback:v;}
+    private static String escapeLike(String v){
+        if(v==null||v.isBlank())return "";
+        return v.trim().replace("\\","\\\\").replace("%","\\%").replace("_","\\_");
+    }
 }
+

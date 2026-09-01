@@ -44,9 +44,8 @@ function setSessionHint(hasSession: boolean) {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [clinician, setClinician] = useState<Clinician | null>(null);
   const pathname = usePathname();
-  const [status, setStatus] = useState<AuthStatus>(() =>
-    pathname === "/login" || !hasSessionHint() ? "unauthenticated" : "loading"
-  );
+  const [status, setStatus] = useState<AuthStatus>("loading");
+  const [sessionExpired, setSessionExpired] = useState(false);
 
   const refresh = useCallback(async () => {
     if (!hasSessionHint()) {
@@ -66,29 +65,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (pathname === "/login" || !hasSessionHint()) {
+    if (pathname === "/login") {
+      setStatus("unauthenticated");
       return;
     }
-    const frame = window.requestAnimationFrame(() => void refresh());
-    return () => window.cancelAnimationFrame(frame);
+    if (!hasSessionHint()) {
+      setStatus("unauthenticated");
+      return;
+    }
+    void refresh();
   }, [pathname, refresh]);
+
 
   useEffect(() => {
     const handleUnauthorized = () => {
       setSessionHint(false);
       setClinician(null);
       setStatus("unauthenticated");
+      if (pathname !== "/login") {
+        setSessionExpired(true);
+      }
     };
     window.addEventListener("patienty:unauthorized", handleUnauthorized);
     return () =>
       window.removeEventListener("patienty:unauthorized", handleUnauthorized);
-  }, []);
+  }, [pathname]);
 
   const login = useCallback(async (email: string, password: string) => {
     const current = await authApi.login(email, password);
     setSessionHint(true);
     setClinician(current);
     setStatus("authenticated");
+    setSessionExpired(false);
   }, []);
 
   const logout = useCallback(async () => {
@@ -98,6 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSessionHint(false);
       setClinician(null);
       setStatus("unauthenticated");
+      setSessionExpired(false);
       if (clinician) clearRecentPatients(clinician.id);
     }
   }, [clinician]);
@@ -107,7 +116,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [clinician, status, login, logout, refresh],
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+      {sessionExpired && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4" role="alertdialog">
+          <div className="card max-w-sm w-full p-6 text-center space-y-4 shadow-2xl bg-white border border-slate-200">
+            <div className="mx-auto grid size-12 place-items-center rounded-2xl bg-amber-100 text-amber-700">
+              <span className="text-xl font-bold">!</span>
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-slate-900">로그인 세션 만료</h2>
+              <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
+                보안을 위해 일정 시간 동안 활동이 없어 세션이 만료되었습니다. 다시 로그인해 주세요.
+              </p>
+            </div>
+            <button
+              className="button-primary w-full justify-center text-sm py-2.5"
+              onClick={() => {
+                setSessionExpired(false);
+                if (typeof window !== "undefined") window.location.href = "/login";
+              }}
+              type="button"
+            >
+              로그인 페이지로 이동
+            </button>
+          </div>
+        </div>
+      )}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {
@@ -115,3 +153,4 @@ export function useAuth() {
   if (!value) throw new Error("useAuth must be used inside AuthProvider.");
   return value;
 }
+

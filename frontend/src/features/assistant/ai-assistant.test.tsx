@@ -7,32 +7,39 @@ import { patientsApi } from "@/lib/api/client";
 vi.mock("@/lib/api/client", () => ({
   patientsApi: {
     ask: vi.fn(),
+    askStream: vi.fn(),
   },
 }));
 
 describe("AI assistant", () => {
   beforeEach(() => {
-    vi.mocked(patientsApi.ask).mockResolvedValue({
-      status: "ANSWERED",
-      answer: "최근 혈압 수치가 상승했습니다.",
-      observations: [
-        {
-          type: "MEASUREMENT_TREND",
-          level: "ATTENTION",
-          text: "수축기 혈압이 상승했습니다.",
-          evidenceIds: ["examination-result:1"],
-        },
-      ],
-      evidence: [
-        {
-          id: "examination-result:1",
-          sourceType: "EXAMINATION_RESULT",
-          occurredAt: "2026-08-20T09:30:00+09:00",
-          label: "8월 20일 혈압 검사",
-        },
-      ],
-      generatedAt: "2026-08-27T12:00:00+09:00",
-    });
+    vi.mocked(patientsApi.askStream).mockImplementation(
+      async (patientId, question, onChunk) => {
+        onChunk("최근 혈압 수치가 ");
+        onChunk("상승했습니다.");
+        return {
+          status: "ANSWERED",
+          answer: "최근 혈압 수치가 상승했습니다.",
+          observations: [
+            {
+              type: "MEASUREMENT_TREND",
+              level: "ATTENTION",
+              text: "수축기 혈압이 상승했습니다.",
+              evidenceIds: ["examination-result:1"],
+            },
+          ],
+          evidence: [
+            {
+              id: "examination-result:1",
+              sourceType: "EXAMINATION_RESULT",
+              occurredAt: "2026-08-20T09:30:00+09:00",
+              label: "8월 20일 혈압 검사",
+            },
+          ],
+          generatedAt: "2026-08-27T12:00:00+09:00",
+        };
+      },
+    );
   });
 
   it("asks a suggested question and opens its source evidence", async () => {
@@ -47,9 +54,10 @@ describe("AI assistant", () => {
     );
 
     await waitFor(() =>
-      expect(patientsApi.ask).toHaveBeenCalledWith(
+      expect(patientsApi.askStream).toHaveBeenCalledWith(
         "patient-1",
         "지난 진료 이후 변경된 사항은?",
+        expect.any(Function),
       ),
     );
     expect(await screen.findByText("최근 혈압 수치가 상승했습니다.")).toBeVisible();
@@ -61,3 +69,4 @@ describe("AI assistant", () => {
     expect(onEvidence).toHaveBeenCalledWith("examination-result:1");
   });
 });
+

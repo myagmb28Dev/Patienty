@@ -9,6 +9,8 @@ import {
   TriangleAlert,
   Users,
 } from "lucide-react";
+
+
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { AttentionBadge, EmptyState, ErrorState, SectionSkeleton } from "@/components/ui/states";
@@ -149,17 +151,19 @@ export function DashboardPage() {
             </section>
 
             <section className="card p-5 sm:p-6">
-              <div className="mb-5 flex items-center justify-between">
+              <div className="mb-5 flex items-center justify-between gap-3">
                 <div>
                   <h2 className="section-title">변화 검토 필요</h2>
                   <p className="mt-1 text-sm text-slate-500">
                     진단이 아닌, 기록상 변화가 감지된 담당 환자입니다.
                   </p>
                 </div>
-                <span className="badge border-slate-200 bg-slate-100 text-xs font-semibold text-slate-700">
-                  AI 변화 감지
+                <span className="badge border-slate-200 bg-slate-100 text-xs font-semibold text-slate-700 whitespace-nowrap shrink-0">
+                  변화 감지
                 </span>
               </div>
+
+
               {loading ? (
                 <SectionSkeleton rows={4} />
               ) : attentionPatients.length === 0 ? (

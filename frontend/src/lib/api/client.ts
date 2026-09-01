@@ -168,6 +168,12 @@ export const authApi = {
       csrfState = null;
     }
   },
+  changePassword: (currentPassword: string, newPassword: string) =>
+    request<void>("/api/v1/auth/password", {
+      method: "POST",
+      body: JSON.stringify({ currentPassword, newPassword }),
+      csrf: true,
+    }),
 };
 
 export const dashboardApi = {
@@ -206,4 +212,89 @@ export const patientsApi = {
       body: JSON.stringify({ question }),
       csrf: true,
     }),
+  askStream: async (
+    patientId: string,
+    question: string,
+    onChunk: (chunk: string) => void,
+  ): Promise<AiResponse> => {
+    const csrfToken = await loadCsrf();
+    const response = await fetch(
+      `${API_BASE_URL}/api/v1/patients/${patientId}/ai/queries/stream`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "text/event-stream",
+          [csrfToken.headerName]: csrfToken.token,
+        },
+        body: JSON.stringify({ question }),
+      },
+    );
+
+    if (!response.ok) {
+      if (response.status === 401) emitUnauthorized();
+      throw await readError(response);
+    }
+
+    if (!response.body) {
+      return await patientsApi.ask(patientId, question);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let buffer = "";
+    let finalResponse: AiResponse | null = null;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      const events = buffer.split("\n\n");
+      buffer = events.pop() ?? "";
+
+      for (const eventBlock of events) {
+        if (!eventBlock.trim()) continue;
+        const lines = eventBlock.split("\n");
+        let eventType = "message";
+        let dataStr = "";
+
+        for (const line of lines) {
+          if (line.startsWith("event:")) {
+            eventType = line.slice(6).trim();
+          } else if (line.startsWith("data:")) {
+            dataStr = line.slice(5).trim();
+          }
+        }
+
+        if (eventType === "chunk" && dataStr) {
+          try {
+            const parsed = JSON.parse(dataStr) as { text: string };
+            if (parsed.text) onChunk(parsed.text);
+          } catch {
+            // ignore malformed chunk
+          }
+        } else if (eventType === "done" && dataStr) {
+          try {
+            finalResponse = JSON.parse(dataStr) as AiResponse;
+          } catch {
+            // ignore malformed done event
+          }
+        } else if (eventType === "error" && dataStr) {
+          try {
+            const parsed = JSON.parse(dataStr) as { message: string };
+            throw new Error(parsed.message || "스트리밍 중 오류가 발생했습니다.");
+          } catch (e) {
+            if (e instanceof Error) throw e;
+            throw new Error("스트리밍 중 오류가 발생했습니다.");
+          }
+        }
+      }
+    }
+
+    if (finalResponse) return finalResponse;
+    return await patientsApi.ask(patientId, question);
+  },
 };
+
