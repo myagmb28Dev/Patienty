@@ -22,4 +22,5 @@ public class Clinician {
     public String getPasswordHash() { return passwordHash; }
     public String getRole() { return role; }
     public boolean isEnabled() { return enabled; }
+    public void updatePasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
 }

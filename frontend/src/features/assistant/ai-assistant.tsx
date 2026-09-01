@@ -35,6 +35,7 @@ export function AiAssistant({
   const [question, setQuestion] = useState("");
   const [lastQuestion, setLastQuestion] = useState("");
   const [response, setResponse] = useState<AiResponse | null>(null);
+  const [streamingText, setStreamingText] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -44,10 +45,16 @@ export function AiAssistant({
     setQuestion(clean);
     setLastQuestion(clean);
     setLoading(true);
+    setStreamingText("");
+    setResponse(null);
     setError("");
 
     try {
-      setResponse(await patientsApi.ask(patientId, clean));
+      const res = await patientsApi.askStream(patientId, clean, (chunk) => {
+        setStreamingText((prev) => prev + chunk);
+      });
+      setResponse(res);
+      setStreamingText("");
     } catch (caught) {
       setError(
         caught instanceof Error
@@ -56,8 +63,10 @@ export function AiAssistant({
       );
     } finally {
       setLoading(false);
+      setStreamingText("");
     }
   };
+
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -116,16 +125,32 @@ export function AiAssistant({
         )}
 
         {loading && (
-          <div className="flex min-h-52 flex-col items-center justify-center text-center" role="status">
-            <LoaderCircle className="size-6 animate-spin text-slate-700" aria-hidden />
-            <p className="mt-3 text-sm font-bold text-slate-800">
-              의무기록 분석 중
-            </p>
-            <p className="mt-1 text-xs text-slate-500">
-              진료, 검사 결과, 처방 이력을 확인하고 있습니다.
-            </p>
+          <div className="space-y-3">
+            {streamingText ? (
+              <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-2xs">
+                <div className="flex items-center gap-2 mb-1.5 text-xs font-bold text-slate-700">
+                  <FileText className="size-3.5 text-slate-600" aria-hidden />
+                  <span>실시간 기록 분석 및 작성 중...</span>
+                </div>
+                <p className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed text-slate-800 font-medium">
+                  {streamingText}
+                  <span className="inline-block w-1.5 h-4 ml-0.5 bg-teal-600 animate-pulse align-middle" />
+                </p>
+              </div>
+            ) : (
+              <div className="flex min-h-52 flex-col items-center justify-center text-center" role="status">
+                <LoaderCircle className="size-6 animate-spin text-slate-700" aria-hidden />
+                <p className="mt-3 text-sm font-bold text-slate-800">
+                  의무기록 분석 중
+                </p>
+                <p className="mt-1 text-xs text-slate-500">
+                  진료, 검사 결과, 처방 이력을 확인하고 있습니다.
+                </p>
+              </div>
+            )}
           </div>
         )}
+
 
         {error && !loading && (
           <div className="rounded-xl border border-rose-200 bg-rose-50/80 p-4" role="alert">

@@ -129,11 +129,13 @@ export function PatientListPage() {
             <Search className="pointer-events-none absolute left-3 top-3.5 size-4 text-slate-400" aria-hidden />
             <input
               className="field pl-10"
+              id="patient-search-input"
               onChange={(event) => setSearchDraft(event.target.value)}
-              placeholder="이름 또는 PAT-000124"
+              placeholder="이름 또는 PAT-000124 (Ctrl+K)"
               type="search"
               value={searchDraft}
             />
+
           </label>
           <label>
             <span className="sr-only">진료과</span>

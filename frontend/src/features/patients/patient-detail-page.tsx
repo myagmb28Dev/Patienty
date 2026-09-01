@@ -11,10 +11,12 @@ import {
   FlaskConical,
   HeartPulse,
   Pill,
+  Printer,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+
 import { AiAssistant } from "@/features/assistant/ai-assistant";
 import { useAuth } from "@/features/auth/auth-provider";
 import { EmptyState, ErrorState, SectionSkeleton } from "@/components/ui/states";
@@ -126,18 +128,28 @@ export function PatientDetailPage() {
   ];
 
   return (
-    <div className="space-y-6">
-      <section>
-        <Link
-          className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-teal-800"
-          href="/patients"
-        >
-          <ArrowLeft className="size-4" aria-hidden />
-          환자 목록
-        </Link>
-        <div className="mt-4 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+    <div className="space-y-6 print:space-y-4">
+      <section className="print:pb-2 print:border-b print:border-slate-300">
+        <div className="flex items-center justify-between print:hidden">
+          <Link
+            className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-teal-800"
+            href="/patients"
+          >
+            <ArrowLeft className="size-4" aria-hidden />
+            환자 목록
+          </Link>
+          <button
+            className="button-secondary text-xs"
+            onClick={() => window.print()}
+            type="button"
+          >
+            <Printer className="size-3.5 text-slate-600" aria-hidden />
+            회진용 인쇄
+          </button>
+        </div>
+        <div className="mt-4 flex flex-col justify-between gap-4 lg:flex-row lg:items-end print:mt-0">
           <div className="flex items-center gap-4">
-            <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-slate-900 text-xl font-bold text-white shadow-xs">
+            <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-slate-900 text-xl font-bold text-white shadow-xs print:bg-slate-800">
               {detail.header.name.slice(0, 1)}
             </div>
             <div>
@@ -168,7 +180,7 @@ export function PatientDetailPage() {
       </section>
 
       {missingCategories.length > 0 && (
-        <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+        <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 print:hidden">
           <AlertCircle className="mt-0.5 size-5 shrink-0" aria-hidden />
           <div>
             <p className="font-black">일부 기록을 표시하지 못했습니다</p>
@@ -181,24 +193,23 @@ export function PatientDetailPage() {
       )}
 
       {evidenceNotice && (
-        <div className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-2xs" role="status">
+        <div className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-2xs print:hidden" role="status">
           <ExternalLink className="size-4 text-slate-700" aria-hidden />
           {evidenceNotice}
         </div>
       )}
 
-      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(340px,1fr)]">
-        <div className="min-w-0 space-y-6">
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(340px,1fr)] print:block">
+        <div className="min-w-0 space-y-6 print:space-y-4">
           <SummaryCard detail={detail} onEvidence={openEvidence} />
 
-          <section className="card p-5 sm:p-6">
+          <section className="card p-5 sm:p-6 print:p-4 print:shadow-none print:border-slate-300">
             <SectionHeading
               icon={HeartPulse}
               subtitle="동일한 단위의 수치만 비교하여 표시합니다."
               title="검사 결과 변화"
             />
             <div className="mt-5">
-
               <MeasurementTrends
                 onEvidence={openEvidence}
                 series={measurements}
@@ -206,7 +217,7 @@ export function PatientDetailPage() {
             </div>
           </section>
 
-          <section className="card p-5 sm:p-6">
+          <section className="card p-5 sm:p-6 print:p-4 print:shadow-none print:border-slate-300">
             <SectionHeading
               icon={ClipboardList}
               subtitle="진료·검사·처방 기록을 시간순으로 정리했습니다."
@@ -217,7 +228,7 @@ export function PatientDetailPage() {
             </div>
           </section>
 
-          <section className="card p-5 sm:p-6">
+          <section className="card p-5 sm:p-6 print:p-4 print:shadow-none print:border-slate-300">
             <SectionHeading
               icon={Pill}
               subtitle="처방 기록이며, 실제 복용 여부를 의미하지 않습니다."
@@ -229,10 +240,13 @@ export function PatientDetailPage() {
           </section>
         </div>
 
-        <AiAssistant patientId={patientId} onEvidence={openEvidence} />
+        <div className="print:hidden">
+          <AiAssistant patientId={patientId} onEvidence={openEvidence} />
+        </div>
       </div>
     </div>
   );
+
 }
 
 function PatientDetailSkeleton() {
