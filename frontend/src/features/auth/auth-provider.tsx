@@ -1,7 +1,15 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { usePathname } from "next/navigation";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { authApi } from "@/lib/api/client";
 import type { Clinician } from "@/lib/api/types";
 import { clearRecentPatients } from "@/lib/recent-patients";
@@ -19,6 +27,11 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 const SESSION_HINT_KEY = "patienty:has_session";
+const sessionListeners = new Set<() => void>();
+
+function notifySessionListeners() {
+  sessionListeners.forEach((listener) => listener());
+}
 
 function hasSessionHint(): boolean {
   if (typeof window === "undefined") return false;
@@ -27,6 +40,20 @@ function hasSessionHint(): boolean {
   } catch {
     return false;
   }
+}
+
+function subscribeSessionHint(callback: () => void) {
+  sessionListeners.add(callback);
+  const handleStorage = (e: StorageEvent) => {
+    if (e.key === SESSION_HINT_KEY) {
+      callback();
+    }
+  };
+  window.addEventListener("storage", handleStorage);
+  return () => {
+    sessionListeners.delete(callback);
+    window.removeEventListener("storage", handleStorage);
+  };
 }
 
 function setSessionHint(hasSession: boolean) {
@@ -39,49 +66,68 @@ function setSessionHint(hasSession: boolean) {
     }
   } catch {
   }
+  notifySessionListeners();
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [clinician, setClinician] = useState<Clinician | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
   const pathname = usePathname();
-  const [status, setStatus] = useState<AuthStatus>("loading");
+  const router = useRouter();
   const [sessionExpired, setSessionExpired] = useState(false);
 
+  const hasSession = useSyncExternalStore(
+    subscribeSessionHint,
+    hasSessionHint,
+    () => true,
+  );
+
+  const isLogin = pathname === "/login";
+
   const refresh = useCallback(async () => {
-    if (!hasSessionHint()) {
+    if (pathname === "/login" || !hasSessionHint()) {
       setClinician(null);
-      setStatus("unauthenticated");
       return;
     }
+    setRefreshing(true);
     try {
       const current = await authApi.me();
       setClinician(current);
-      setStatus("authenticated");
     } catch {
       setSessionHint(false);
       setClinician(null);
-      setStatus("unauthenticated");
+    } finally {
+      setRefreshing(false);
     }
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
-    if (pathname === "/login") {
-      setStatus("unauthenticated");
+    if (isLogin || !hasSession) {
       return;
     }
-    if (!hasSessionHint()) {
-      setStatus("unauthenticated");
-      return;
-    }
-    void refresh();
-  }, [pathname, refresh]);
+    let cancelled = false;
+    authApi.me()
+      .then((current) => {
+        if (!cancelled) {
+          setClinician(current);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setSessionHint(false);
+          setClinician(null);
+        }
+      });
 
+    return () => {
+      cancelled = true;
+    };
+  }, [isLogin, hasSession]);
 
   useEffect(() => {
     const handleUnauthorized = () => {
       setSessionHint(false);
       setClinician(null);
-      setStatus("unauthenticated");
       if (pathname !== "/login") {
         setSessionExpired(true);
       }
@@ -95,7 +141,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const current = await authApi.login(email, password);
     setSessionHint(true);
     setClinician(current);
-    setStatus("authenticated");
     setSessionExpired(false);
   }, []);
 
@@ -105,11 +150,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setSessionHint(false);
       setClinician(null);
-      setStatus("unauthenticated");
       setSessionExpired(false);
       if (clinician) clearRecentPatients(clinician.id);
     }
   }, [clinician]);
+
+  const status: AuthStatus = useMemo(() => {
+    if (isLogin) return "unauthenticated";
+    if (!hasSession) return "unauthenticated";
+    if (clinician) return "authenticated";
+    if (refreshing) return "loading";
+    return "loading";
+  }, [isLogin, hasSession, clinician, refreshing]);
 
   const value = useMemo(
     () => ({ clinician, status, login, logout, refresh }),
@@ -135,7 +187,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               className="button-primary w-full justify-center text-sm py-2.5"
               onClick={() => {
                 setSessionExpired(false);
-                if (typeof window !== "undefined") window.location.href = "/login";
+                router.push("/login");
               }}
               type="button"
             >
