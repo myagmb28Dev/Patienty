@@ -34,8 +34,9 @@ patienty:
     provider: ${PATIENTY_AI_PROVIDER:openrouter}
     openrouter:
       api-key: ${OPENROUTER_API_KEY:}
-      model: ${PATIENTY_AI_OPENROUTER_MODEL:google/gemini-2.0-flash-001}
+      model: ${PATIENTY_AI_OPENROUTER_MODEL:google/gemini-2.5-flash}
       base-url: ${OPENROUTER_BASE_URL:https://openrouter.ai/api/v1}
+
   cors:
     allowed-origins: ${PATIENTY_CORS_ALLOWED_ORIGINS:http://localhost:3000}
 
