@@ -12,8 +12,8 @@ import {
   HeartPulse,
   Pill,
   Printer,
-  Sparkles,
 } from "lucide-react";
+
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -212,9 +212,8 @@ export function PatientDetailPage() {
                 subtitle="동일한 단위의 수치만 비교하여 표시합니다."
                 title="검사 결과 변화"
               />
-              <span className="badge border-slate-200 bg-slate-50 text-[11px] font-semibold text-slate-700">
-                <Sparkles className="size-3 text-slate-500" aria-hidden />
-                AI 추세 분석
+              <span className="badge border-slate-200 bg-slate-50 text-[11px] font-semibold text-slate-700 whitespace-nowrap shrink-0">
+                수치 추이
               </span>
             </div>
             <div className="mt-5">
@@ -224,6 +223,7 @@ export function PatientDetailPage() {
               />
             </div>
           </section>
+
 
 
           <section className="card p-5 sm:p-6 print:p-4 print:shadow-none print:border-slate-300">
@@ -331,16 +331,15 @@ function SummaryCard({
   return (
     <section className="card overflow-hidden">
       <div className="border-b border-slate-200/80 bg-white p-5 sm:p-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 text-sm font-bold text-slate-900">
-            <div className="grid size-8 place-items-center rounded-lg bg-teal-50 text-teal-700 border border-teal-200/60">
-              <Sparkles className="size-4" aria-hidden />
+            <div className="grid size-8 place-items-center rounded-lg bg-slate-100 text-slate-700">
+              <Activity className="size-4.5" aria-hidden />
             </div>
             임상 경과 요약
           </div>
-          <span className="badge border-teal-200 bg-teal-50 text-xs font-semibold text-teal-800">
-            <Sparkles className="size-3" aria-hidden />
-            AI 데이터 분석
+          <span className="badge border-slate-200 bg-slate-100 text-xs font-semibold text-slate-700 whitespace-nowrap shrink-0">
+            임상 분석 요약
           </span>
         </div>
         <div className="mt-4 rounded-xl border border-slate-200/70 bg-slate-50/70 p-4">
@@ -350,17 +349,13 @@ function SummaryCard({
         </div>
       </div>
       <div className="p-5 sm:p-6 bg-slate-50/30">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h3 className="text-sm font-bold text-slate-900">주요 관찰 및 임상적 변화</h3>
-            <p className="mt-0.5 text-xs text-slate-500">
-              AI가 진료·검사·처방 데이터를 분석하여 감지한 주요 변화입니다.
-            </p>
-          </div>
-          <span className="badge border-amber-200 bg-amber-50 text-[11px] font-semibold text-amber-800">
-            AI 이상 변화 감지
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-sm font-bold text-slate-900">주요 관찰 및 임상적 변화</h3>
+          <span className="badge border-amber-200 bg-amber-50 text-[11px] font-semibold text-amber-800 whitespace-nowrap shrink-0">
+            이상 변화 감지
           </span>
         </div>
+
 
         {observations.length === 0 ? (
           <div className="mt-3 flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 text-sm font-medium text-slate-600">

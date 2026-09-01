@@ -86,8 +86,8 @@ export function AiAssistant({
               <p className="text-[11px] text-slate-400">진료·검사·처방 기반 요약 검색</p>
             </div>
           </div>
-          <span className="badge border-slate-700 bg-slate-800/80 text-[10px] font-medium text-slate-300">
-            데이터 분석
+          <span className="badge border-slate-700 bg-slate-800/80 text-[10px] font-medium text-slate-300 whitespace-nowrap shrink-0">
+            AI 데이터 분석
           </span>
         </div>
       </header>
@@ -100,13 +100,14 @@ export function AiAssistant({
                 의무기록 항목별 빠른 조회
               </p>
               <p className="mt-1 text-[11px] leading-relaxed text-slate-500">
-                조회할 항목을 선택하거나 하단에 검색어를 입력하면 환자의 진료·검사·처방 기록을 분석하여 핵심 요약과 원본 근거를 제공합니다.
+                조회할 항목을 선택하거나 하단에 질문을 입력하면 AI가 환자의 진료·검사·처방 기록을 종합 분석하여 핵심 요약과 원본 근거를 제공합니다.
               </p>
             </div>
             <div className="space-y-1.5">
               <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                 주요 조회 항목
               </p>
+
               {suggestedQueries.map(({ label, icon: Icon, query }) => (
                 <button
                   className="flex w-full items-center gap-2.5 rounded-lg border border-slate-200/90 bg-white p-2.5 text-left transition hover:border-slate-300 hover:bg-slate-50 shadow-2xs"
@@ -194,8 +195,8 @@ export function AiAssistant({
           />
         </div>
         <div className="mt-2 flex items-center justify-between gap-3">
-          <p className="text-[10px] text-slate-400">
-            의무기록 기반 참고용 분석
+          <p className="text-[10px] text-slate-400 whitespace-nowrap">
+            AI 의무기록 분석 기반 · 임상 참고용
           </p>
           <button
             aria-label="기록 검색"
@@ -203,6 +204,7 @@ export function AiAssistant({
             disabled={!question.trim() || loading}
             type="submit"
           >
+
             <Search className="size-3.5" aria-hidden />
             조회하기
           </button>

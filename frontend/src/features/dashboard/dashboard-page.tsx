@@ -5,11 +5,11 @@ import {
   CalendarClock,
   Clock3,
   Search,
-  Sparkles,
   Stethoscope,
   TriangleAlert,
   Users,
 } from "lucide-react";
+
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
@@ -151,18 +151,18 @@ export function DashboardPage() {
             </section>
 
             <section className="card p-5 sm:p-6">
-              <div className="mb-5 flex items-center justify-between">
+              <div className="mb-5 flex items-center justify-between gap-3">
                 <div>
                   <h2 className="section-title">변화 검토 필요</h2>
                   <p className="mt-1 text-sm text-slate-500">
-                    진단이 아닌, AI 데이터 분석으로 기록상 변화가 감지된 담당 환자입니다.
+                    진단이 아닌, 기록상 변화가 감지된 담당 환자입니다.
                   </p>
                 </div>
-                <span className="badge border-teal-200 bg-teal-50 text-xs font-semibold text-teal-800">
-                  <Sparkles className="size-3" aria-hidden />
-                  AI 분석 적용
+                <span className="badge border-slate-200 bg-slate-100 text-xs font-semibold text-slate-700 whitespace-nowrap shrink-0">
+                  변화 감지
                 </span>
               </div>
+
 
               {loading ? (
                 <SectionSkeleton rows={4} />
