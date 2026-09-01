@@ -44,10 +44,7 @@ function setSessionHint(hasSession: boolean) {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [clinician, setClinician] = useState<Clinician | null>(null);
   const pathname = usePathname();
-  const [status, setStatus] = useState<AuthStatus>(() =>
-    pathname === "/login" || !hasSessionHint() ? "unauthenticated" : "loading"
-  );
-
+  const [status, setStatus] = useState<AuthStatus>("loading");
   const [sessionExpired, setSessionExpired] = useState(false);
 
   const refresh = useCallback(async () => {
@@ -68,12 +65,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (pathname === "/login" || !hasSessionHint()) {
+    if (pathname === "/login") {
+      setStatus("unauthenticated");
       return;
     }
-    const frame = window.requestAnimationFrame(() => void refresh());
-    return () => window.cancelAnimationFrame(frame);
+    if (!hasSessionHint()) {
+      setStatus("unauthenticated");
+      return;
+    }
+    void refresh();
   }, [pathname, refresh]);
+
 
   useEffect(() => {
     const handleUnauthorized = () => {
