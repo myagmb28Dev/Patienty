@@ -7,6 +7,14 @@ spring:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/patienty}
     username: ${SPRING_DATASOURCE_USERNAME:patienty}
     password: ${SPRING_DATASOURCE_PASSWORD:patienty}
+    hikari:
+      minimum-idle: 2
+      maximum-pool-size: 10
+      connection-timeout: 20000
+      max-lifetime: 600000
+      keepalive-time: 30000
+      idle-timeout: 300000
+      validation-timeout: 5000
   jpa:
     open-in-view: false
     hibernate:

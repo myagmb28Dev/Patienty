@@ -144,16 +144,15 @@ function unwrapItems<T>(value: T[] | { items: T[] }): T[] {
 }
 
 export const authApi = {
-  csrf: () => loadCsrf(),
+  csrf: (force = false) => loadCsrf(force),
   login: async (email: string, password: string) => {
-    await loadCsrf(true);
     const clinician = await request<Clinician>("/api/v1/auth/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
       csrf: true,
       notifyUnauthorized: false,
     });
-    await loadCsrf(true);
+    void loadCsrf(true).catch(() => {});
     return clinician;
   },
   me: () =>
