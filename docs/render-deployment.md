@@ -107,8 +107,8 @@
 1. **백엔드 헬스체크**: `https://<backend-url>.onrender.com/actuator/health` 접속 시 `{"status":"UP"}` 확인
 2. **프론트엔드 접속**: `https://<frontend-url>.onrender.com/login` 접속
 3. **데모 계정 로그인 테스트**:
-   - 이메일: `kim.doctor@patienty.dev`
-   - 비밀번호: `password123!` (또는 시드된 데모 계정 정보)
+   - 의사 계정 1 (김의사): `doctor.kim@patienty.local` / `PatientyDemo1!`
+   - 의사 계정 2 (이의사): `doctor.lee@patienty.local` / `PatientyDemo1!`
 4. **환자 목록 및 상세 조회**: 환자 타임라인, 생체 지표 추세 차트 로딩 확인
 5. **AI 어시스턴트 질의응답**: 환자 상세 화면에서 OpenRouter AI 질의응답 정상 동작 확인
 
