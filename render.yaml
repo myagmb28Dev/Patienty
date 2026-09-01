@@ -2,9 +2,7 @@
 # Docs: https://render.com/docs/blueprint-spec
 
 services:
-  # ------------------------------------------------------------
-  # Backend API Service (Spring Boot 4 / Java 17)
-  # ------------------------------------------------------------
+  # Backend API Service
   - type: web
     name: patienty-backend
     runtime: docker
@@ -32,10 +30,7 @@ services:
       - key: PATIENTY_AI_OPENROUTER_MODEL
         value: google/gemini-2.5-flash
 
-
-  # ------------------------------------------------------------
-  # Frontend Web Service (Next.js 16 / React 19)
-  # ------------------------------------------------------------
+  # Frontend Web Service
   - type: web
     name: patienty-frontend
     runtime: docker
