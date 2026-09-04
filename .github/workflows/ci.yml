@@ -4,8 +4,6 @@ on:
   pull_request:
     branches:
       - main
-    types:
-      - closed
 
 permissions:
   contents: read
@@ -13,7 +11,7 @@ permissions:
 jobs:
   backend-ci:
     name: Backend CI
-    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'feature/')
+    if: startsWith(github.head_ref, 'feature/')
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -39,7 +37,7 @@ jobs:
 
   frontend-ci:
     name: Frontend CI
-    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'feature/')
+    if: startsWith(github.head_ref, 'feature/')
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
