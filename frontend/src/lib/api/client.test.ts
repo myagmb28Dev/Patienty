@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const clinician = {
   id: "clinician-1",
@@ -8,8 +8,19 @@ const clinician = {
 };
 
 describe("typed API client", () => {
+  afterEach(() => vi.unstubAllEnvs());
   beforeEach(() => {
     vi.resetModules();
+  });
+
+  it("uses same-origin requests when deployed behind the Azure proxy", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "/");
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify(clinician), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const { authApi } = await import("@/lib/api/client");
+    await authApi.me();
+    expect(fetchMock.mock.calls[0][0]).toBe("/api/v1/auth/me");
+    expect((fetchMock.mock.calls[0][1] as RequestInit).credentials).toBe("include");
   });
 
   it("keeps the CSRF token in memory and sends session credentials", async () => {

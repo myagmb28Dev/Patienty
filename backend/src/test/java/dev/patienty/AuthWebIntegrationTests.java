@@ -16,10 +16,18 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-@SpringBootTest @ActiveProfiles("demo") @Testcontainers @AutoConfigureMockMvc
+@SpringBootTest(properties = "management.endpoint.health.probes.enabled=true") @ActiveProfiles("demo") @Testcontainers @AutoConfigureMockMvc
 class AuthWebIntegrationTests {
     @Container @ServiceConnection static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:17-alpine");
     @Autowired MockMvc mockMvc;
+
+    @Test void healthProbesAreAvailableWithoutLoginButOtherActuatorEndpointsAreNot() throws Exception {
+        mockMvc.perform(get("/actuator/health/liveness")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"));
+        mockMvc.perform(get("/actuator/health/readiness")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"));
+        mockMvc.perform(get("/actuator/info")).andExpect(status().isUnauthorized());
+    }
 
     @Test void sessionLoginRequiresCsrfAndAuthenticatesSubsequentRequests() throws Exception {
         mockMvc.perform(get("/api/v1/patients")).andExpect(status().isUnauthorized());

@@ -3,10 +3,16 @@ spring:
     import: optional:file:../.env[.properties]
   datasource:
     url: ${SPRING_DATASOURCE_URL}
+    hikari:
+      minimum-idle: 0
+      maximum-pool-size: 5
+      keepalive-time: 0
+      idle-timeout: 60000
   flyway:
     locations: classpath:db/migration
 
 server:
+  forward-headers-strategy: framework
   servlet:
     session:
       cookie:
@@ -22,3 +28,9 @@ springdoc:
     enabled: false
   swagger-ui:
     enabled: false
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true

@@ -3,3 +3,5 @@ build
 .git
 .gitignore
 HELP.md
+.env*
+!.env.example

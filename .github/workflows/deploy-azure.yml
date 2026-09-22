@@ -1,0 +1,66 @@
+name: Deploy Azure
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_apps:
+        description: Update existing apps (disable for initial image bootstrap)
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  actions: read
+  id-token: write
+
+concurrency:
+  group: azure-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+      AZURE_REGISTRY: ${{ vars.AZURE_REGISTRY }}
+      API_PROXY_TARGET: ${{ vars.AZURE_API_PROXY_TARGET }}
+      IMAGE_TAG: ${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Require successful CI on the deployment commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          result=$(gh run list --workflow ci.yml --branch main --commit "$GITHUB_SHA" --event push --json conclusion --jq '.[0].conclusion')
+          test "$result" = success || { echo "CI must pass for $GITHUB_SHA before deployment"; exit 1; }
+          test -n "$AZURE_RESOURCE_GROUP" && test -n "$AZURE_REGISTRY" && test -n "$API_PROXY_TARGET"
+      - name: Azure login with GitHub OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Build and publish immutable images
+        run: |
+          az acr login --name "$AZURE_REGISTRY"
+          registry="$AZURE_REGISTRY.azurecr.io"
+          docker build -t "$registry/patienty-backend:$IMAGE_TAG" backend
+          docker build --build-arg NEXT_PUBLIC_API_BASE_URL=/ --build-arg API_PROXY_TARGET="$API_PROXY_TARGET" -t "$registry/patienty-frontend:$IMAGE_TAG" frontend
+          docker push "$registry/patienty-backend:$IMAGE_TAG"
+          docker push "$registry/patienty-frontend:$IMAGE_TAG"
+      - name: Deploy verified images
+        if: inputs.deploy_apps
+        run: |
+          registry="$AZURE_REGISTRY.azurecr.io"
+          az extension add --name containerapp --upgrade --only-show-errors
+          az containerapp update -g "$AZURE_RESOURCE_GROUP" -n patienty-backend --image "$registry/patienty-backend:$IMAGE_TAG" --output none
+          az containerapp update -g "$AZURE_RESOURCE_GROUP" -n patienty-frontend --image "$registry/patienty-frontend:$IMAGE_TAG" --output none
+      - name: Check the public application
+        if: inputs.deploy_apps
+        env:
+          PUBLIC_ORIGIN: ${{ vars.AZURE_PUBLIC_ORIGIN }}
+        run: |
+          test -n "$PUBLIC_ORIGIN"
+          curl --fail --retry 12 --retry-all-errors --retry-delay 10 "$PUBLIC_ORIGIN/login" -o /dev/null
+          curl --fail --retry 12 --retry-all-errors --retry-delay 10 "$PUBLIC_ORIGIN/api/v1/auth/csrf" -o /dev/null
