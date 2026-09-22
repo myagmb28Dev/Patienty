@@ -1,5 +1,7 @@
 # Patienty (페이션티)
 
+배포 구성과 운영 방법은 [Azure 배포 가이드](docs/azure-deployment.md)를 참고하세요.
+
 Patienty는 바쁜 의료진이 환자의 진료 기록과 최근 변화를 신속하고 정확하게 파악할 수 있도록 돕는 **AI 기반 환자 맥락 파악 코파일럿(Patient Context Copilot)** 서비스입니다.
 
 ---
@@ -62,4 +64,3 @@ Patienty는 의료진이 환자 상세 페이지에 진입한 후 10초 안에 �
 - **Web Frontend (Next.js)**: 의료진이 진료 중 직관적으로 정보를 탐색하고 차트를 확인할 수 있는 반응형 웹 애플리케이션
 - **Backend API (Spring Boot)**: 데이터 정규화, 시계열 추세 계산, AI 맥락 빌더 및 안전한 권한 검증을 수행하는 비즈니스 엔진
 - **Database (PostgreSQL)**: 환자 정보, 진료 기록, 검사 수치, 처방전 데이터를 구조화하여 관리하는 관계형 데이터베이스
-
