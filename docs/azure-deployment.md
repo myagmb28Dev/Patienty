@@ -4,12 +4,14 @@ Patienty runs on Azure for Students in Korea Central with the subscription spend
 
 ## Architecture
 
-- Resource group `rg-patienty`, Consumption environment `cae-patienty`, and ACR Basic registry `patienty520a1be2`.
+- Resource group `rg-patienty`, standard environment `cae-patienty-standard` with only the Consumption workload profile, and ACR Basic registry `patienty520a1be2`.
 - Frontend: `patienty-frontend`, 0.25 vCPU / 0.5 GiB, zero to one replica, public HTTPS ingress on port 3000.
 - Backend: `patienty-backend`, 0.25 vCPU / 0.5 GiB, exactly one replica, internal ingress on port 8080. Sessions are in memory, so deployments restart sessions and require signing in again.
 - The frontend proxies `/api/*` to the internal backend. Browser requests use the frontend origin; actuator endpoints are not proxied.
 - A pull-only managed identity reads images. A separate GitHub OIDC identity can push images to this registry and update only the two Patienty apps.
 - No dedicated workload profile or Log Analytics workspace is provisioned.
+
+Create the environment with `--environment-mode WorkloadProfiles --logs-destination none`. Do not rely on CLI defaults: the initial deployment created an Express environment even with a Consumption profile listed. Its `external=false` setting did not block our external HTTP checks. Validate isolation by requesting the backend FQDN from outside Azure; do not treat the control-plane flag alone as proof. The standard environment preserves the intended frontend/backend architecture.
 
 ## Configuration
 
@@ -52,6 +54,6 @@ Configure startup probes with enough time for Spring Boot to initialize on 0.25 
 
 The frontend scales to zero, but the backend and ACR have continuing costs. Credits and free grants are finite. Neon had used 94% of its monthly compute allowance when migration was prepared on September 22, 2026. Review current usage in Neon before assuming the remaining allowance is sufficient.
 
-Existing Render files are retained during migration as a fallback. Do not destroy old services or data until Azure validation is complete. Keep-alive pings are unnecessary and prevent the frontend or Neon from sleeping. Do not change the Azure subscription to pay-as-you-go as part of this deployment.
+Render Blueprint and environment-sync automation have been retired from this repository. Previous configuration remains in Git history; this change does not delete old Render services or data. Keep-alive pings are unnecessary and prevent the frontend or Neon from sleeping. Do not change the Azure subscription to pay-as-you-go as part of this deployment.
 
 References: [Azure health probes](https://learn.microsoft.com/en-us/azure/container-apps/health-probes), [managed-identity image pulls](https://learn.microsoft.com/en-us/azure/container-apps/managed-identity-image-pull).
